@@ -1,0 +1,113 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getProfile } from "@/lib/auth/actions";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
+import { LayoutGrid, Plus } from "lucide-react";
+import type { Application } from "@/types/database";
+
+export default async function AdminAppsPage() {
+  const profile = await getProfile();
+
+  if (!profile || !["admin", "manager"].includes(profile.role)) {
+    redirect("/dashboard");
+  }
+
+  const supabase = await createClient();
+  const { data: apps } = await supabase
+    .from("applications")
+    .select("*")
+    .order("name");
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">App Management</h1>
+          <p className="text-muted-foreground mt-1">
+            Register and manage applications in the portal.
+          </p>
+        </div>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" /> Add Application
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Application
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Slug
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Visibility
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Created
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {apps?.map((app: Application) => (
+                  <tr key={app.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                          <LayoutGrid className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{app.name}</p>
+                          <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                            {app.url}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-mono text-muted-foreground">
+                      {app.slug}
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge variant="secondary" className="capitalize">
+                        {app.visibility}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge variant={app.is_active ? "success" : "destructive"}>
+                        {app.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {formatDate(app.created_at)}
+                    </td>
+                  </tr>
+                ))}
+                {(!apps || apps.length === 0) && (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <LayoutGrid className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+                      <p className="text-muted-foreground">No applications registered yet.</p>
+                      <p className="text-sm text-muted-foreground/70 mt-1">
+                        Click &quot;Add Application&quot; to register your first app.
+                      </p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
