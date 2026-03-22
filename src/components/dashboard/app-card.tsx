@@ -30,6 +30,7 @@ export function AppCard({
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
             </CardTitle>
             <CardDescription className="text-xs">{description}</CardDescription>
+            <p className="text-[10px] text-red-500 mt-1 break-all">DEBUG URL: &quot;{url}&quot; → &quot;{fullUrl}&quot;</p>
           </div>
         </div>
       </CardHeader>
