@@ -3,7 +3,8 @@ import { getProfile } from "@/lib/auth/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, LayoutGrid, Lock } from "lucide-react";
+import { ExternalLink, LayoutGrid } from "lucide-react";
+import { RequestAccessButton } from "@/components/apps/request-access-button";
 import Link from "next/link";
 
 export default async function AppsPage() {
@@ -76,9 +77,7 @@ export default async function AppsPage() {
                     </Link>
                   </Button>
                 ) : (
-                  <Button variant="outline" className="w-full" disabled>
-                    <Lock className="mr-2 h-4 w-4" /> Request Access
-                  </Button>
+                  <RequestAccessButton appId={app.id} appName={app.name} />
                 )}
               </CardContent>
             </Card>
