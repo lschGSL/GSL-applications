@@ -2,6 +2,7 @@
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LayoutGrid, ExternalLink } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export function AppCard({
   name,
@@ -14,8 +15,18 @@ export function AppCard({
 }) {
   const fullUrl = url && url.trim() ? (url.startsWith("http") ? url : `https://${url}`) : "";
 
-  const handleClick = () => {
-    if (fullUrl) {
+  const handleClick = async () => {
+    if (!fullUrl) return;
+
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session) {
+      const authUrl = new URL("/auth/exchange", fullUrl);
+      authUrl.searchParams.set("access_token", session.access_token);
+      authUrl.searchParams.set("refresh_token", session.refresh_token);
+      window.open(authUrl.toString(), "_blank", "noopener,noreferrer");
+    } else {
       window.open(fullUrl, "_blank", "noopener,noreferrer");
     }
   };

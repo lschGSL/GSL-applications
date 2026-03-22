@@ -2,9 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, LayoutGrid } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 import { RequestAccessButton } from "@/components/apps/request-access-button";
+import { OpenAppButton } from "@/components/apps/open-app-button";
 
 export default async function AppsPage() {
   const supabase = await createClient();
@@ -70,15 +70,7 @@ export default async function AppsPage() {
                   {app.description || "No description available."}
                 </p>
                 {hasAccess ? (
-                  <Button asChild className="w-full">
-                    <a
-                      href={app.url.startsWith("http") ? app.url : `https://${app.url}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Open Application <ExternalLink className="ml-2 h-4 w-4" />
-                    </a>
-                  </Button>
+                  <OpenAppButton url={app.url} />
                 ) : (
                   <RequestAccessButton appId={app.id} appName={app.name} />
                 )}
