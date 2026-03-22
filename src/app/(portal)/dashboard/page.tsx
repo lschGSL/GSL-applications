@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   const isAdmin = profile?.role === "admin" || profile?.role === "manager";
 
   // Fetch stats
-  const [appsResult, usersResult, logsResult, accessResult] = await Promise.all([
+  const [appsResult, usersResult, logsResult, accessResult, allAppsResult] = await Promise.all([
     supabase.from("applications").select("*", { count: "exact", head: true }),
     isAdmin
       ? supabase.from("profiles").select("*", { count: "exact", head: true })
@@ -25,7 +25,20 @@ export default async function DashboardPage() {
       .from("app_access")
       .select("app_id, applications(name, slug, description, icon_url, url)")
       .eq("user_id", profile?.id ?? ""),
+    // Admins see all active apps
+    isAdmin
+      ? supabase
+          .from("applications")
+          .select("id, name, slug, description, icon_url, url")
+          .eq("is_active", true)
+          .order("name")
+      : Promise.resolve({ data: null }),
   ]);
+
+  // For admins: show all apps; for regular users: show only apps they have access to
+  const userApps = isAdmin && allAppsResult.data
+    ? allAppsResult.data.map((app: any) => ({ app_id: app.id, applications: app }))
+    : accessResult.data;
 
   const stats = [
     {
@@ -48,7 +61,7 @@ export default async function DashboardPage() {
     },
     {
       name: "Your Apps",
-      value: accessResult.data?.length ?? 0,
+      value: userApps?.length ?? 0,
       icon: Shield,
       visible: true,
     },
@@ -83,9 +96,9 @@ export default async function DashboardPage() {
       {/* Quick access apps */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Your Applications</h2>
-        {accessResult.data && accessResult.data.length > 0 ? (
+        {userApps && userApps.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {accessResult.data.map((access: any) => (
+            {userApps.map((access: any) => (
               <a
                 key={access.app_id}
                 href={access.applications?.url || "#"}
