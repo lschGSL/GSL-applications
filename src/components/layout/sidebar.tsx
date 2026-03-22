@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -34,11 +33,10 @@ export function Sidebar({ profile }: { profile: Profile }) {
     <aside className="hidden w-64 flex-col border-r bg-sidebar-background lg:flex">
       {/* Logo */}
       <div className="flex h-16 items-center gap-2 border-b px-6">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/gsl-logo.png"
           alt="GSL"
-          width={120}
-          height={40}
           className="h-7 w-auto"
         />
       </div>

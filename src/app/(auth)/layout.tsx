@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -7,13 +6,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen flex flex-col">
       <header className="flex h-16 items-center justify-between px-6 border-b">
         <Link href="/" className="flex items-center gap-3">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/gsl-logo.png"
             alt="GSL"
-            width={120}
-            height={40}
             className="h-8 w-auto"
-            priority
           />
         </Link>
         <ThemeToggle />

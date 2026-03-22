@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Shield, Users, LayoutGrid, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -11,13 +10,11 @@ export default function HomePage() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-3">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/gsl-logo.png"
               alt="GSL"
-              width={120}
-              height={40}
               className="h-8 w-auto"
-              priority
             />
           </Link>
           <div className="flex items-center gap-3">
@@ -100,11 +97,10 @@ export default function HomePage() {
           <div className="grid gap-8 md:grid-cols-3">
             {/* Company Info */}
             <div>
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/gsl-logo.png"
                 alt="GSL"
-                width={120}
-                height={40}
                 className="h-8 w-auto mb-4 brightness-0 invert"
               />
               <p className="text-sm text-white/60">

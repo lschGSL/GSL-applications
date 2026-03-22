@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { LogOut, User, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -14,11 +13,10 @@ export function TopNav({ profile }: { profile: Profile }) {
         <Button variant="ghost" size="icon" className="lg:hidden">
           <Menu className="h-5 w-5" />
         </Button>
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/gsl-logo.png"
           alt="GSL"
-          width={100}
-          height={32}
           className="h-6 w-auto lg:hidden"
         />
       </div>
