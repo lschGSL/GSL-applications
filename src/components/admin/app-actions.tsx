@@ -4,18 +4,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
-  ChevronDown,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  MoreHorizontal,
   Pencil,
   Trash2,
   Archive,
   CheckCircle,
-  Power,
 } from "lucide-react";
 import type { Application } from "@/types/database";
 import { EditAppDialog } from "./edit-app-dialog";
 
 export function AppActions({ app }: { app: Application }) {
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -36,7 +41,6 @@ export function AppActions({ app }: { app: Application }) {
       router.refresh();
     } finally {
       setLoading(false);
-      setOpen(false);
     }
   }
 
@@ -53,73 +57,54 @@ export function AppActions({ app }: { app: Application }) {
       router.refresh();
     } finally {
       setLoading(false);
-      setOpen(false);
       setShowDeleteConfirm(false);
     }
   }
 
   return (
     <>
-      <div className="relative">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setOpen(!open)}
-          disabled={loading}
-          className="gap-1"
-        >
-          Actions <ChevronDown className="h-3 w-3" />
-        </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" disabled={loading}>
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Actions</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setShowEdit(true)}>
+            <Pencil className="h-4 w-4" />
+            Edit
+          </DropdownMenuItem>
 
-        {open && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-            <div className="absolute right-0 z-50 mt-1 w-48 rounded-lg border bg-popover p-2 shadow-lg">
-              <button
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
-                onClick={() => {
-                  setOpen(false);
-                  setShowEdit(true);
-                }}
-              >
-                <Pencil className="h-4 w-4" />
-                Edit
-              </button>
+          {app.is_active ? (
+            <DropdownMenuItem
+              className="text-amber-600"
+              onClick={() => updateApp({ is_active: false })}
+            >
+              <Archive className="h-4 w-4" />
+              Archive
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              className="text-green-600"
+              onClick={() => updateApp({ is_active: true })}
+            >
+              <CheckCircle className="h-4 w-4" />
+              Reactivate
+            </DropdownMenuItem>
+          )}
 
-              {app.is_active ? (
-                <button
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-amber-600 hover:bg-accent"
-                  onClick={() => updateApp({ is_active: false })}
-                >
-                  <Archive className="h-4 w-4" />
-                  Archive
-                </button>
-              ) : (
-                <button
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-green-600 hover:bg-accent"
-                  onClick={() => updateApp({ is_active: true })}
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Reactivate
-                </button>
-              )}
+          <DropdownMenuSeparator />
 
-              <div className="my-1 border-t" />
-
-              <button
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive hover:bg-accent"
-                onClick={() => {
-                  setOpen(false);
-                  setShowDeleteConfirm(true);
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+          <DropdownMenuItem
+            className="text-destructive"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {showEdit && (
         <EditAppDialog app={app} onClose={() => setShowEdit(false)} />
