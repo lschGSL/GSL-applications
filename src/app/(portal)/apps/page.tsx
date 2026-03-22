@@ -24,7 +24,7 @@ export default async function AppsPage() {
     .eq("user_id", profile?.id ?? "");
 
   const accessibleAppIds = new Set(access?.map((a) => a.app_id) ?? []);
-  const isAdmin = profile?.role === "admin";
+  const isAdmin = profile?.role === "admin" || profile?.role === "manager";
 
   return (
     <div className="space-y-8">
@@ -71,7 +71,11 @@ export default async function AppsPage() {
                 </p>
                 {hasAccess ? (
                   <Button asChild className="w-full">
-                    <a href={app.url} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={app.url.startsWith("http") ? app.url : `https://${app.url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Open Application <ExternalLink className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
