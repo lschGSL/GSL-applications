@@ -9,8 +9,8 @@ export default async function DashboardPage() {
   const profile = await getProfile();
   const isAdmin = profile?.role === "admin" || profile?.role === "manager";
 
-  // Fetch stats
-  const [appsResult, usersResult, logsResult, accessResult, allAppsResult] = await Promise.all([
+  // Fetch stats and apps
+  const [appsResult, usersResult, logsResult, accessResult] = await Promise.all([
     supabase.from("applications").select("*", { count: "exact", head: true }),
     isAdmin
       ? supabase.from("profiles").select("*", { count: "exact", head: true })
@@ -25,20 +25,19 @@ export default async function DashboardPage() {
       .from("app_access")
       .select("app_id, applications(name, slug, description, icon_url, url)")
       .eq("user_id", profile?.id ?? ""),
-    // Admins see all active apps
-    isAdmin
-      ? supabase
-          .from("applications")
-          .select("id, name, slug, description, icon_url, url")
-          .eq("is_active", true)
-          .order("name")
-      : Promise.resolve({ data: null }),
   ]);
 
-  // For admins: show all apps; for regular users: show only apps they have access to
-  const userApps = isAdmin && allAppsResult.data
-    ? allAppsResult.data.map((app: any) => ({ app_id: app.id, applications: app }))
-    : accessResult.data;
+  // For admins: fetch all apps directly (same query as admin page)
+  let userApps = accessResult.data;
+  if (isAdmin) {
+    const { data: allApps } = await supabase
+      .from("applications")
+      .select("*")
+      .order("name");
+    if (allApps && allApps.length > 0) {
+      userApps = allApps.map((app) => ({ app_id: app.id, applications: app }));
+    }
+  }
 
   const stats = [
     {
@@ -101,7 +100,10 @@ export default async function DashboardPage() {
             {userApps.map((access: any) => (
               <a
                 key={access.app_id}
-                href={access.applications?.url?.startsWith("http") ? access.applications.url : `https://${access.applications?.url || ""}`}
+                href={(() => {
+                  const url = access.applications?.url || "";
+                  return url.startsWith("http") ? url : `https://${url}`;
+                })()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block"
