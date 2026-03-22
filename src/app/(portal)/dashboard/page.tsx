@@ -40,9 +40,6 @@ export default async function DashboardPage() {
     }
   }
 
-  // Debug: log the actual app data
-  console.log("DEBUG userApps:", JSON.stringify(userApps, null, 2));
-
   const stats = [
     {
       name: "Total Applications",
