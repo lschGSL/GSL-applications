@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, LayoutGrid } from "lucide-react";
 import { RequestAccessButton } from "@/components/apps/request-access-button";
-import Link from "next/link";
 
 export default async function AppsPage() {
   const supabase = await createClient();
@@ -72,9 +71,9 @@ export default async function AppsPage() {
                 </p>
                 {hasAccess ? (
                   <Button asChild className="w-full">
-                    <Link href={app.url} target="_blank" rel="noopener noreferrer">
+                    <a href={app.url} target="_blank" rel="noopener noreferrer">
                       Open Application <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
+                    </a>
                   </Button>
                 ) : (
                   <RequestAccessButton appId={app.id} appName={app.name} />
