@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, X, Loader2 } from "lucide-react";
 
-export function AddAppDialog() {
-  const [open, setOpen] = useState(false);
+export function AddAppDialog({ showDialog }: { showDialog: boolean }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -44,7 +44,7 @@ export function AddAppDialog() {
         return;
       }
 
-      setOpen(false);
+      router.push("/admin/apps");
       router.refresh();
     } catch {
       setError("Network error");
@@ -55,17 +55,21 @@ export function AddAppDialog() {
 
   return (
     <>
-      <Button type="button" onClick={() => setOpen(true)}>
-        <Plus className="mr-2 h-4 w-4" /> Add Application
+      <Button type="button" asChild>
+        <Link href="/admin/apps?add=true">
+          <Plus className="mr-2 h-4 w-4" /> Add Application
+        </Link>
       </Button>
 
-      {open && (
+      {showDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <Card className="w-full max-w-lg mx-4">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Register Application</CardTitle>
-              <Button type="button" variant="ghost" size="icon" onClick={() => { setOpen(false); setError(null); }}>
-                <X className="h-4 w-4" />
+              <Button type="button" variant="ghost" size="icon" asChild>
+                <Link href="/admin/apps">
+                  <X className="h-4 w-4" />
+                </Link>
               </Button>
             </CardHeader>
             <CardContent>
@@ -136,8 +140,8 @@ export function AddAppDialog() {
                   </select>
                 </div>
                 <div className="flex gap-3 pt-2">
-                  <Button type="button" variant="outline" className="flex-1" onClick={() => { setOpen(false); setError(null); }}>
-                    Cancel
+                  <Button type="button" variant="outline" className="flex-1" asChild>
+                    <Link href="/admin/apps">Cancel</Link>
                   </Button>
                   <Button type="submit" className="flex-1" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -8,13 +8,18 @@ import { LayoutGrid } from "lucide-react";
 import { AddAppDialog } from "@/components/admin/add-app-dialog";
 import type { Application } from "@/types/database";
 
-export default async function AdminAppsPage() {
+export default async function AdminAppsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ add?: string }>;
+}) {
   const profile = await getProfile();
 
   if (!profile || !["admin", "manager"].includes(profile.role)) {
     redirect("/dashboard");
   }
 
+  const params = await searchParams;
   const supabase = await createClient();
   const { data: apps } = await supabase
     .from("applications")
@@ -30,7 +35,7 @@ export default async function AdminAppsPage() {
             Register and manage applications in the portal.
           </p>
         </div>
-        <AddAppDialog />
+        <AddAppDialog showDialog={params.add === "true"} />
       </div>
 
       <Card>
