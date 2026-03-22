@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { LayoutGrid } from "lucide-react";
 import { AddAppDialog } from "@/components/admin/add-app-dialog";
+import { AppActions } from "@/components/admin/app-actions";
 import type { Application } from "@/types/database";
 
 export default async function AdminAppsPage({
@@ -59,6 +60,9 @@ export default async function AdminAppsPage({
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Created
                   </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -93,11 +97,14 @@ export default async function AdminAppsPage({
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {formatDate(app.created_at)}
                     </td>
+                    <td className="px-6 py-4 text-right">
+                      <AppActions app={app} />
+                    </td>
                   </tr>
                 ))}
                 {(!apps || apps.length === 0) && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center">
+                    <td colSpan={6} className="px-6 py-12 text-center">
                       <LayoutGrid className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                       <p className="text-muted-foreground">No applications registered yet.</p>
                       <p className="text-sm text-muted-foreground/70 mt-1">
