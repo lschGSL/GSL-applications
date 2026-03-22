@@ -101,7 +101,7 @@ export default async function DashboardPage() {
             {userApps.map((access: any) => (
               <a
                 key={access.app_id}
-                href={access.applications?.url || "#"}
+                href={access.applications?.url?.startsWith("http") ? access.applications.url : `https://${access.applications?.url || ""}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block"
