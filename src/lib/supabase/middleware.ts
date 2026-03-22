@@ -51,8 +51,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isPublicPath) {
+  // Redirect authenticated users away from auth pages (but allow /auth/exchange to process tokens)
+  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";
