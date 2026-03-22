@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LayoutGrid, Users, ScrollText, Shield } from "lucide-react";
+import { LayoutGrid, Users, ScrollText, Shield, ExternalLink } from "lucide-react";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -23,7 +23,7 @@ export default async function DashboardPage() {
       : Promise.resolve({ count: 0 }),
     supabase
       .from("app_access")
-      .select("app_id, applications(name, slug, description, icon_url)")
+      .select("app_id, applications(name, slug, description, icon_url, url)")
       .eq("user_id", profile?.id ?? ""),
   ]);
 
@@ -86,23 +86,32 @@ export default async function DashboardPage() {
         {accessResult.data && accessResult.data.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {accessResult.data.map((access: any) => (
-              <Card key={access.app_id} className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <LayoutGrid className="h-5 w-5 text-primary" />
+              <a
+                key={access.app_id}
+                href={access.applications?.url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                        <LayoutGrid className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-base flex items-center gap-1.5">
+                          {access.applications?.name}
+                          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          {access.applications?.description || "No description"}
+                        </CardDescription>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-base">
-                        {access.applications?.name}
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        {access.applications?.description || "No description"}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
+                  </CardHeader>
+                </Card>
+              </a>
             ))}
           </div>
         ) : (
