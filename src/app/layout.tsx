@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "GSL Portal",
   description: "GSL Applications Portal - Centralized access to all company applications",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
