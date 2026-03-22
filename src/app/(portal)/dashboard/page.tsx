@@ -3,6 +3,7 @@ import { getProfile } from "@/lib/auth/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LayoutGrid, Users, ScrollText, Shield, ExternalLink } from "lucide-react";
+import { AppCard } from "@/components/dashboard/app-card";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -98,35 +99,12 @@ export default async function DashboardPage() {
         {userApps && userApps.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {userApps.map((access: any) => (
-              <a
+              <AppCard
                 key={access.app_id}
-                href={(() => {
-                  const url = access.applications?.url || "";
-                  return url.startsWith("http") ? url : `https://${url}`;
-                })()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                        <LayoutGrid className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-base flex items-center gap-1.5">
-                          {access.applications?.name}
-                          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                        </CardTitle>
-                        <CardDescription className="text-xs">
-                          {access.applications?.description || "No description"}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </a>
+                name={access.applications?.name || "Unknown"}
+                description={access.applications?.description || "No description"}
+                url={access.applications?.url || ""}
+              />
             ))}
           </div>
         ) : (
