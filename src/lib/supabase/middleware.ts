@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAllowedRedirect } from "@/lib/utils";
 
 const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/auth/callback"];
 
@@ -53,6 +54,11 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (user && isPublicPath) {
+    // If there's an external redirect param, honour it (e.g. already-logged-in user visiting /login?redirect=https://...)
+    const redirectParam = request.nextUrl.searchParams.get("redirect");
+    if (redirectParam && isAllowedRedirect(redirectParam)) {
+      return NextResponse.redirect(redirectParam);
+    }
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

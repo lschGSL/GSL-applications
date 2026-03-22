@@ -32,6 +32,9 @@ function LoginForm() {
     if (result?.error) {
       setError(result.error);
       setLoading(false);
+    } else if (result?.redirectTo) {
+      // External redirect to an allowed domain
+      window.location.href = result.redirectTo;
     }
   }
 

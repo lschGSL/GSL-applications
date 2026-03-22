@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { isAllowedRedirect, isExternalUrl } from "@/lib/utils";
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
@@ -30,6 +31,16 @@ export async function signIn(formData: FormData) {
   }
 
   const redirectTo = formData.get("redirect") as string;
+
+  // External redirect: return the URL to the client for window.location redirect
+  if (redirectTo && isExternalUrl(redirectTo)) {
+    if (isAllowedRedirect(redirectTo)) {
+      return { redirectTo };
+    }
+    // Invalid external domain — fall back to dashboard
+    redirect("/dashboard");
+  }
+
   redirect(redirectTo || "/dashboard");
 }
 
