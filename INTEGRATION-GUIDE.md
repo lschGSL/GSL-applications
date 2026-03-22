@@ -438,11 +438,52 @@ export function createClient() {
 }
 ```
 
-### 5.3 Middleware d'authentification — `/src/middleware.ts`
+### 5.3 Route d'échange de tokens — `/src/app/auth/exchange/route.ts`
+
+> **CRITIQUE** : Cette route doit exister dans votre application. C'est elle qui reçoit les tokens du portail et établit la session locale.
+
+```typescript
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const accessToken = searchParams.get("access_token");
+  const refreshToken = searchParams.get("refresh_token");
+
+  if (!accessToken || !refreshToken) {
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?message=Missing authentication tokens`
+    );
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+
+  if (error) {
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?message=Could not authenticate`
+    );
+  }
+
+  // Redirige vers la page principale de l'application
+  return NextResponse.redirect(`${origin}/`);
+}
+```
+
+### 5.4 Middleware d'authentification — `/src/middleware.ts`
+
+> **IMPORTANT** : Le middleware DOIT exclure `/auth/exchange` de la vérification d'authentification. Sans cela, le middleware redirige la requête AVANT que le route handler ne puisse traiter les tokens, causant une boucle de redirection vers le portail.
 
 ```typescript
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+
+// Routes qui NE nécessitent PAS d'authentification
+const publicPaths = ["/auth/exchange", "/api"];
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -451,6 +492,14 @@ export async function middleware(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    return supabaseResponse;
+  }
+
+  // Ne PAS bloquer les routes publiques (surtout /auth/exchange !)
+  const isPublicPath = publicPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
+  if (isPublicPath) {
     return supabaseResponse;
   }
 
@@ -476,9 +525,9 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Rediriger vers le portail si non authentifié
-  if (!user && !request.nextUrl.pathname.startsWith("/api")) {
+  if (!user) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?redirect=${request.nextUrl.toString()}`
+      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?redirect=${encodeURIComponent(request.nextUrl.toString())}`
     );
   }
 
@@ -492,7 +541,7 @@ export const config = {
 };
 ```
 
-> **Note** : Si l'utilisateur n'est pas authentifié, il est redirigé vers la page de login du **portail** (`apps.gsl.lu/login`), pas vers une page de login locale. Après connexion, le portail redirige l'utilisateur vers l'application avec un token de session valide (même instance Supabase = même cookies de session).
+> **Note** : Si l'utilisateur n'est pas authentifié, il est redirigé vers la page de login du **portail** (`apps.gsl.lu/login`), pas vers une page de login locale. Le portail envoie ensuite l'utilisateur vers `/auth/exchange` avec les tokens pour établir la session.
 
 ---
 
