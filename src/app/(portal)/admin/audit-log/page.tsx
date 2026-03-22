@@ -5,15 +5,35 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { ScrollText } from "lucide-react";
+import { AuditLogPagination } from "@/components/admin/audit-log-pagination";
 
-export default async function AuditLogPage() {
+const PAGE_SIZE = 25;
+
+export default async function AuditLogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const profile = await getProfile();
 
   if (!profile || profile.role !== "admin") {
     redirect("/dashboard");
   }
 
+  const params = await searchParams;
+  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
+  const offset = (currentPage - 1) * PAGE_SIZE;
+
   const supabase = await createClient();
+
+  // Get total count
+  const { count } = await supabase
+    .from("audit_logs")
+    .select("*", { count: "exact", head: true });
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
+
+  // Get page of logs
   const { data: logs } = await supabase
     .from("audit_logs")
     .select(`
@@ -21,7 +41,7 @@ export default async function AuditLogPage() {
       profiles:user_id (email, full_name)
     `)
     .order("created_at", { ascending: false })
-    .limit(100);
+    .range(offset, offset + PAGE_SIZE - 1);
 
   const actionColors: Record<string, "default" | "secondary" | "destructive" | "success" | "warning" | "outline"> = {
     sign_in: "success",
@@ -29,15 +49,21 @@ export default async function AuditLogPage() {
     create: "default",
     update: "warning",
     delete: "destructive",
+    request_access: "outline",
+    grant_access: "success",
+    revoke_access: "destructive",
   };
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
-        <p className="text-muted-foreground mt-1">
-          Complete history of all system events and user actions.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
+          <p className="text-muted-foreground mt-1">
+            Complete history of all system events and user actions.
+          </p>
+        </div>
+        <Badge variant="secondary">{count ?? 0} events</Badge>
       </div>
 
       <Card>
@@ -97,6 +123,10 @@ export default async function AuditLogPage() {
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <AuditLogPagination currentPage={currentPage} totalPages={totalPages} />
+          )}
         </CardContent>
       </Card>
     </div>

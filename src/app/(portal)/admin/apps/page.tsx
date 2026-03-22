@@ -3,9 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { LayoutGrid, Plus } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
+import { AddAppDialog } from "@/components/admin/add-app-dialog";
 import type { Application } from "@/types/database";
 
 export default async function AdminAppsPage() {
@@ -30,9 +30,7 @@ export default async function AdminAppsPage() {
             Register and manage applications in the portal.
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Application
-        </Button>
+        <AddAppDialog />
       </div>
 
       <Card>

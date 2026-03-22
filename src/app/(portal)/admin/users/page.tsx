@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserActions } from "@/components/admin/user-actions";
 import { getInitials, formatDate } from "@/lib/utils";
 import type { Profile } from "@/types/database";
 
@@ -57,6 +58,9 @@ export default async function UsersPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Joined
                   </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -90,6 +94,9 @@ export default async function UsersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {formatDate(user.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <UserActions user={user} currentUserId={profile.id} />
                     </td>
                   </tr>
                 ))}
