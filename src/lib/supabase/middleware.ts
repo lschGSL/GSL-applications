@@ -35,6 +35,18 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // Supabase may redirect auth codes to / when redirect URLs are not whitelisted.
+  // Forward them to /auth/callback so the code gets properly exchanged.
+  if (request.nextUrl.pathname === "/") {
+    const code = request.nextUrl.searchParams.get("code");
+    const token_hash = request.nextUrl.searchParams.get("token_hash");
+    if (code || token_hash) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/callback";
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Handle Supabase auth errors (e.g. expired reset link redirected to /)
   const errorCode = request.nextUrl.searchParams.get("error_code");
   if (errorCode && request.nextUrl.pathname === "/") {
