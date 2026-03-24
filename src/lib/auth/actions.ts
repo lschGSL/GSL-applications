@@ -89,9 +89,16 @@ export async function signOut() {
 export async function forgotPassword(formData: FormData) {
   const supabase = await createClient();
 
+  // Build the redirect URL from the request headers so it works
+  // regardless of whether NEXT_PUBLIC_APP_URL is configured.
+  const headersList = await headers();
+  const host = headersList.get("host") ?? "gsl-applications.vercel.app";
+  const proto = headersList.get("x-forwarded-proto") ?? "https";
+  const appUrl = `${proto}://${host}`;
+
   const { error } = await supabase.auth.resetPasswordForEmail(
     formData.get("email") as string,
-    { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password` }
+    { redirectTo: `${appUrl}/auth/callback?next=/reset-password` }
   );
 
   if (error) {
