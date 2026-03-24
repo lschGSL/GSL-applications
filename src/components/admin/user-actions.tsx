@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Shield, ShieldCheck, UserCog, Eye, Ban, CheckCircle } from "lucide-react";
-import type { Profile, UserRole } from "@/types/database";
+import { ChevronDown, Shield, ShieldCheck, UserCog, Eye, Ban, CheckCircle, Building } from "lucide-react";
+import type { Profile, UserRole, GslEntity } from "@/types/database";
 
 const roles: { value: UserRole; label: string; icon: React.ElementType }[] = [
   { value: "admin", label: "Admin", icon: ShieldCheck },
@@ -20,7 +20,14 @@ export function UserActions({ user, currentUserId }: { user: Profile; currentUse
   const router = useRouter();
   const isSelf = user.id === currentUserId;
 
-  async function updateUser(updates: { role?: UserRole; is_active?: boolean }) {
+  const entities: { value: GslEntity | null; label: string }[] = [
+    { value: null, label: "None" },
+    { value: "gsl_fiduciaire", label: "GSL Fiduciaire" },
+    { value: "gsl_revision", label: "GSL Révision" },
+    { value: "both", label: "Both" },
+  ];
+
+  async function updateUser(updates: { role?: UserRole; is_active?: boolean; entity?: GslEntity | null }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/users/${user.id}`, {
@@ -69,6 +76,24 @@ export function UserActions({ user, currentUserId }: { user: Profile; currentUse
                   <Icon className="h-4 w-4" />
                   {role.label}
                   {isCurrentRole && <Badge variant="secondary" className="ml-auto text-xs">Current</Badge>}
+                </button>
+              );
+            })}
+
+            <div className="my-1 border-t" />
+            <p className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase">Entity</p>
+            {entities.map((entity) => {
+              const isCurrent = user.entity === entity.value;
+              return (
+                <button
+                  key={entity.value ?? "none"}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent disabled:opacity-50"
+                  disabled={isCurrent}
+                  onClick={() => updateUser({ entity: entity.value })}
+                >
+                  <Building className="h-4 w-4" />
+                  {entity.label}
+                  {isCurrent && <Badge variant="secondary" className="ml-auto text-xs">Current</Badge>}
                 </button>
               );
             })}

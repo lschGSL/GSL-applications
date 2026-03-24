@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
+import { sendAccessGrantedNotification, sendAccessRevokedNotification } from "@/lib/email/resend";
 
 // Grant app access to a user
 export async function POST(request: NextRequest) {
@@ -52,6 +53,21 @@ export async function POST(request: NextRequest) {
     user_agent: headersList.get("user-agent"),
   });
 
+  // Notify user via email
+  const [{ data: targetUser }, { data: app }] = await Promise.all([
+    supabase.from("profiles").select("email, full_name").eq("id", user_id).single(),
+    supabase.from("applications").select("name, url").eq("id", app_id).single(),
+  ]);
+
+  if (targetUser && app) {
+    sendAccessGrantedNotification({
+      userEmail: targetUser.email,
+      userName: targetUser.full_name || targetUser.email,
+      appName: app.name,
+      appUrl: app.url,
+    }).catch(() => {});
+  }
+
   return NextResponse.json(data, { status: 201 });
 }
 
@@ -96,6 +112,20 @@ export async function DELETE(request: NextRequest) {
     ip_address: headersList.get("x-forwarded-for") || "unknown",
     user_agent: headersList.get("user-agent"),
   });
+
+  // Notify user via email
+  const [{ data: targetUser }, { data: app }] = await Promise.all([
+    supabase.from("profiles").select("email, full_name").eq("id", user_id).single(),
+    supabase.from("applications").select("name").eq("id", app_id).single(),
+  ]);
+
+  if (targetUser && app) {
+    sendAccessRevokedNotification({
+      userEmail: targetUser.email,
+      userName: targetUser.full_name || targetUser.email,
+      appName: app.name,
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ success: true });
 }

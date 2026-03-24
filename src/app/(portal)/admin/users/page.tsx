@@ -5,21 +5,39 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserActions } from "@/components/admin/user-actions";
+import { SearchInput } from "@/components/admin/search-input";
+import { InviteUserDialog } from "@/components/admin/invite-user-dialog";
 import { getInitials, formatDate } from "@/lib/utils";
 import type { Profile } from "@/types/database";
 
-export default async function UsersPage() {
+export default async function UsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; invite?: string }>;
+}) {
   const profile = await getProfile();
 
   if (!profile || !["admin", "manager"].includes(profile.role)) {
     redirect("/dashboard");
   }
 
+  const params = await searchParams;
+  const query = params.q?.toLowerCase() ?? "";
+
   const supabase = await createClient();
-  const { data: users } = await supabase
+  const { data: allUsers } = await supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
+
+  const users = query
+    ? allUsers?.filter(
+        (u) =>
+          u.full_name?.toLowerCase().includes(query) ||
+          u.email.toLowerCase().includes(query) ||
+          u.role.toLowerCase().includes(query)
+      )
+    : allUsers;
 
   const roleColors: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
     admin: "destructive",
@@ -37,8 +55,13 @@ export default async function UsersPage() {
             Manage user accounts, roles, and permissions.
           </p>
         </div>
-        <Badge variant="secondary">{users?.length ?? 0} users</Badge>
+        <div className="flex items-center gap-3">
+          <InviteUserDialog showDialog={params.invite === "true"} />
+          <Badge variant="secondary">{users?.length ?? 0} users</Badge>
+        </div>
       </div>
+
+      <SearchInput placeholder="Search users by name, email, or role..." />
 
       <Card>
         <CardContent className="p-0">
@@ -51,6 +74,9 @@ export default async function UsersPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Role
+                  </th>
+                  <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Entity
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Status
@@ -86,6 +112,15 @@ export default async function UsersPage() {
                       <Badge variant={roleColors[user.role] ?? "secondary"} className="capitalize">
                         {user.role}
                       </Badge>
+                    </td>
+                    <td className="hidden md:table-cell px-6 py-4">
+                      {user.entity ? (
+                        <Badge variant="outline" className="text-xs">
+                          {user.entity === "gsl_fiduciaire" ? "Fiduciaire" : user.entity === "gsl_revision" ? "Révision" : "Both"}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant={user.is_active ? "success" : "destructive"}>

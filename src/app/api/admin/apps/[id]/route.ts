@@ -29,14 +29,16 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await request.json();
-  const { name, slug, description, url, visibility, is_active } = body;
+  const { name, slug, description, url, icon_url, visibility, entity, is_active } = body;
 
   const updates: Record<string, unknown> = {};
   if (name !== undefined) updates.name = name;
   if (slug !== undefined) updates.slug = slug;
   if (description !== undefined) updates.description = description;
   if (url !== undefined) updates.url = url;
+  if (icon_url !== undefined) updates.icon_url = icon_url;
   if (visibility !== undefined) updates.visibility = visibility;
+  if (entity !== undefined) updates.entity = entity;
   if (is_active !== undefined) updates.is_active = is_active;
 
   if (Object.keys(updates).length === 0) {

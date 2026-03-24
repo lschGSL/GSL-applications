@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 import {
   LayoutDashboard,
   LayoutGrid,
@@ -17,20 +17,21 @@ import {
 import type { Profile } from "@/types/database";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Applications", href: "/apps", icon: LayoutGrid },
-  { name: "Security", href: "/settings/security", icon: ShieldCheck },
+  { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "nav.applications", href: "/apps", icon: LayoutGrid },
+  { key: "nav.security", href: "/settings/security", icon: ShieldCheck },
 ];
 
 const adminNavigation = [
-  { name: "User Management", href: "/admin/users", icon: Users },
-  { name: "App Management", href: "/admin/apps", icon: Shield },
-  { name: "Audit Log", href: "/admin/audit-log", icon: ScrollText },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  { key: "nav.userManagement", href: "/admin/users", icon: Users },
+  { key: "nav.appManagement", href: "/admin/apps", icon: Shield },
+  { key: "nav.auditLog", href: "/admin/audit-log", icon: ScrollText },
+  { key: "nav.settings", href: "/admin/settings", icon: Settings },
 ];
 
 export function MobileSidebar({ profile, open, onClose }: { profile: Profile; open: boolean; onClose: () => void }) {
   const pathname = usePathname();
+  const { t } = useI18n();
   const isAdmin = profile.role === "admin" || profile.role === "manager";
 
   if (!open) return null;
@@ -51,13 +52,13 @@ export function MobileSidebar({ profile, open, onClose }: { profile: Profile; op
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
           <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-            Main
+            {t("nav.main")}
           </div>
           {navigation.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
-                key={item.name}
+                key={item.key}
                 href={item.href}
                 onClick={onClose}
                 className={cn(
@@ -68,7 +69,7 @@ export function MobileSidebar({ profile, open, onClose }: { profile: Profile; op
                 )}
               >
                 <item.icon className="h-4 w-4" />
-                {item.name}
+                {t(item.key)}
               </Link>
             );
           })}
@@ -76,13 +77,13 @@ export function MobileSidebar({ profile, open, onClose }: { profile: Profile; op
           {isAdmin && (
             <>
               <div className="mb-2 mt-6 px-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-                Administration
+                {t("nav.administration")}
               </div>
               {adminNavigation.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
                   <Link
-                    key={item.name}
+                    key={item.key}
                     href={item.href}
                     onClick={onClose}
                     className={cn(
@@ -93,7 +94,7 @@ export function MobileSidebar({ profile, open, onClose }: { profile: Profile; op
                     )}
                   >
                     <item.icon className="h-4 w-4" />
-                    {item.name}
+                    {t(item.key)}
                   </Link>
                 );
               })}

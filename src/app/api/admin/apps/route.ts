@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { name, slug, description, url, visibility } = body;
+  const { name, slug, description, url, icon_url, visibility, entity } = body;
 
   if (!name || !slug || !url) {
     return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("applications")
-    .insert({ name, slug, description, url, visibility: visibility || "internal" })
+    .insert({ name, slug, description, url, icon_url: icon_url || null, visibility: visibility || "internal", entity: entity || null })
     .select()
     .single();
 

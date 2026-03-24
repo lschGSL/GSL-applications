@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { ScrollText } from "lucide-react";
 import { AuditLogPagination } from "@/components/admin/audit-log-pagination";
+import { SearchInput } from "@/components/admin/search-input";
 import type { AuditLog } from "@/types/database";
 
 const PAGE_SIZE = 25;
@@ -13,7 +14,7 @@ const PAGE_SIZE = 25;
 export default async function AuditLogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const profile = await getProfile();
 
@@ -22,27 +23,53 @@ export default async function AuditLogPage({
   }
 
   const params = await searchParams;
+  const query = params.q?.toLowerCase() ?? "";
   const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
-  const offset = (currentPage - 1) * PAGE_SIZE;
 
   const supabase = await createClient();
 
-  // Get total count
-  const { count } = await supabase
-    .from("audit_logs")
-    .select("*", { count: "exact", head: true });
-
-  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
-
-  // Get page of logs
-  const { data: logs } = await supabase
+  // Build query - fetch all logs for filtering, or paginated if no search
+  let logsQuery = supabase
     .from("audit_logs")
     .select(`
       *,
       profiles:user_id (email, full_name)
     `)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
+    .order("created_at", { ascending: false });
+
+  // If filtering by action, use Supabase filter
+  if (query) {
+    // Fetch more results for client-side filtering since we can't ilike on joined columns
+    logsQuery = logsQuery.limit(500);
+  }
+
+  const { data: allLogs } = query ? await logsQuery : await logsQuery.range(
+    (currentPage - 1) * PAGE_SIZE,
+    (currentPage - 1) * PAGE_SIZE + PAGE_SIZE - 1
+  );
+
+  // Get total count
+  const { count: totalCount } = await supabase
+    .from("audit_logs")
+    .select("*", { count: "exact", head: true });
+
+  // Filter client-side if search query exists
+  const filteredLogs = query
+    ? allLogs?.filter((log: AuditLog & { profiles?: { email?: string; full_name?: string } }) =>
+        log.action.toLowerCase().includes(query) ||
+        log.resource_type.toLowerCase().includes(query) ||
+        log.profiles?.email?.toLowerCase().includes(query) ||
+        log.profiles?.full_name?.toLowerCase().includes(query) ||
+        log.ip_address?.includes(query)
+      )
+    : allLogs;
+
+  const logs = query
+    ? filteredLogs?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+    : filteredLogs;
+
+  const totalItems = query ? (filteredLogs?.length ?? 0) : (totalCount ?? 0);
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   const actionColors: Record<string, "default" | "secondary" | "destructive" | "success" | "warning" | "outline"> = {
     sign_in: "success",
@@ -64,8 +91,10 @@ export default async function AuditLogPage({
             Complete history of all system events and user actions.
           </p>
         </div>
-        <Badge variant="secondary">{count ?? 0} events</Badge>
+        <Badge variant="secondary">{totalItems} events</Badge>
       </div>
+
+      <SearchInput placeholder="Search by user, action, resource, or IP..." />
 
       <Card>
         <CardContent className="p-0">

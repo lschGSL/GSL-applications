@@ -2,12 +2,15 @@ export type UserRole = "admin" | "manager" | "member" | "viewer";
 
 export type AppVisibility = "internal" | "external" | "both";
 
+export type GslEntity = "gsl_fiduciaire" | "gsl_revision" | "both";
+
 export interface Profile {
   id: string;
   email: string;
   full_name: string | null;
   avatar_url: string | null;
   role: UserRole;
+  entity: GslEntity | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -21,6 +24,7 @@ export interface Application {
   url: string;
   icon_url: string | null;
   visibility: AppVisibility;
+  entity: GslEntity | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -47,4 +51,19 @@ export interface AuditLog {
   // Joined fields
   user_email?: string;
   user_name?: string;
+}
+
+export interface Invitation {
+  id: string;
+  email: string;
+  role: UserRole;
+  entity: GslEntity | null;
+  token: string;
+  invited_by: string | null;
+  accepted_at: string | null;
+  expires_at: string;
+  created_at: string;
+  // Joined
+  inviter_name?: string;
+  inviter_email?: string;
 }
