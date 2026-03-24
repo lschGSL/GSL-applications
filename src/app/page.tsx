@@ -1,9 +1,25 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Shield, Users, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const params = await searchParams;
+
+  // Supabase sends auth codes to / when redirect URLs are not whitelisted.
+  // Forward to /auth/callback so the code is properly exchanged.
+  if (params.code) {
+    const qs = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value) qs.set(key, value);
+    }
+    redirect(`/auth/callback?${qs.toString()}`);
+  }
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header - matching gsl.lu navigation style */}
