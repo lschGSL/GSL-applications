@@ -11,9 +11,10 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next");
 
   if (code || (token_hash && type)) {
-    // Build a placeholder redirect — the final URL may change if we detect recovery
     const defaultNext = next ?? "/dashboard";
-    const defaultRedirectUrl = isAllowedRedirect(defaultNext) ? defaultNext : `${origin}${defaultNext}`;
+    const defaultRedirectUrl = isAllowedRedirect(defaultNext)
+      ? defaultNext
+      : `${origin}${defaultNext}`;
     const response = NextResponse.redirect(defaultRedirectUrl);
 
     const supabase = createServerClient(
@@ -24,7 +25,13 @@ export async function GET(request: NextRequest) {
           getAll() {
             return request.cookies.getAll();
           },
-          setAll(cookiesToSet) {
+          setAll(
+            cookiesToSet: {
+              name: string;
+              value: string;
+              options?: Record<string, unknown>;
+            }[]
+          ) {
             cookiesToSet.forEach(({ name, value, options }) => {
               response.cookies.set(name, value, options);
             });
@@ -50,12 +57,15 @@ export async function GET(request: NextRequest) {
       // If no explicit `next` was provided (Supabase stripped the redirect),
       // detect password-recovery sessions and redirect to /reset-password.
       if (!next && session?.user?.recovery_sent_at) {
-        const recoverySentAt = new Date(session.user.recovery_sent_at).getTime();
+        const recoverySentAt = new Date(
+          session.user.recovery_sent_at
+        ).getTime();
         const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
         if (recoverySentAt > twoHoursAgo) {
-          // Rewrite the redirect location to /reset-password, keeping cookies intact
-          const recoveryResponse = NextResponse.redirect(`${origin}/reset-password`);
-          response.cookies.getAll().forEach(cookie => {
+          const recoveryResponse = NextResponse.redirect(
+            `${origin}/reset-password`
+          );
+          response.cookies.getAll().forEach((cookie) => {
             recoveryResponse.cookies.set(cookie.name, cookie.value);
           });
           return recoveryResponse;
@@ -65,5 +75,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?message=Could not authenticate`);
+  return NextResponse.redirect(
+    `${origin}/login?message=Could not authenticate`
+  );
 }
