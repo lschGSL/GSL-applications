@@ -1,21 +1,67 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import { isAllowedRedirect } from "@/lib/utils";
+import type { EmailOtpType, Session } from "@supabase/supabase-js";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const token_hash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType | null;
+  const next = searchParams.get("next");
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      // Support external redirects to allowed domains
-      if (isAllowedRedirect(next)) {
-        return NextResponse.redirect(next);
+  if (code || (token_hash && type)) {
+    // Build a placeholder redirect — the final URL may change if we detect recovery
+    const defaultNext = next ?? "/dashboard";
+    const defaultRedirectUrl = isAllowedRedirect(defaultNext) ? defaultNext : `${origin}${defaultNext}`;
+    const response = NextResponse.redirect(defaultRedirectUrl);
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
       }
-      return NextResponse.redirect(`${origin}${next}`);
+    );
+
+    let error: Error | null = null;
+    let session: Session | null = null;
+
+    if (code) {
+      const result = await supabase.auth.exchangeCodeForSession(code);
+      error = result.error;
+      session = result.data?.session ?? null;
+    } else if (token_hash && type) {
+      const result = await supabase.auth.verifyOtp({ token_hash, type });
+      error = result.error;
+      session = result.data?.session ?? null;
+    }
+
+    if (!error) {
+      // If no explicit `next` was provided (Supabase stripped the redirect),
+      // detect password-recovery sessions and redirect to /reset-password.
+      if (!next && session?.user?.recovery_sent_at) {
+        const recoverySentAt = new Date(session.user.recovery_sent_at).getTime();
+        const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+        if (recoverySentAt > twoHoursAgo) {
+          // Rewrite the redirect location to /reset-password, keeping cookies intact
+          const recoveryResponse = NextResponse.redirect(`${origin}/reset-password`);
+          response.cookies.getAll().forEach(cookie => {
+            recoveryResponse.cookies.set(cookie.name, cookie.value);
+          });
+          return recoveryResponse;
+        }
+      }
+      return response;
     }
   }
 
