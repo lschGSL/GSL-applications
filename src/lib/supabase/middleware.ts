@@ -77,8 +77,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages (but allow /auth/exchange and /reset-password)
-  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange") && !request.nextUrl.pathname.startsWith("/reset-password")) {
+  // Redirect authenticated users away from auth pages (but allow /auth/exchange, /reset-password, and /mfa-verify)
+  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange") && !request.nextUrl.pathname.startsWith("/reset-password") && !request.nextUrl.pathname.startsWith("/mfa-verify")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";
