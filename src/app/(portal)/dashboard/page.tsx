@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
-import { getMFAStatus } from "@/lib/auth/mfa-actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LayoutGrid, Users, ScrollText, Shield, ExternalLink } from "lucide-react";
@@ -30,8 +29,15 @@ export default async function DashboardPage() {
       .eq("user_id", profile?.id ?? ""),
   ]);
 
-  // Check MFA status
-  const mfaStatus = await getMFAStatus();
+  // Check MFA status directly using the existing supabase client
+  let mfaEnrolled = false;
+  try {
+    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const verifiedFactors = factors?.totp?.filter((f) => f.status === "verified") ?? [];
+    mfaEnrolled = verifiedFactors.length > 0;
+  } catch {
+    // If MFA check fails, show the banner (enrolled = false)
+  }
 
   // For admins: fetch all apps directly (same query as admin page)
   let userApps = accessResult.data;
@@ -75,7 +81,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* MFA reminder banner */}
-      {!mfaStatus.enrolled && <MfaBanner />}
+      {!mfaEnrolled && <MfaBanner />}
 
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
