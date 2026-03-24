@@ -83,3 +83,57 @@ Optional:
 - **Supabase redirect URLs**: The Supabase dashboard must whitelist the callback URL (e.g., `https://gsl-applications.vercel.app/auth/callback`). If not whitelisted, Supabase sends codes to `/` instead - the middleware handles this fallback.
 - **Security headers** are configured in `next.config.ts` (HSTS, X-Frame-Options, CSP-ready).
 - **Row-Level Security** is enabled on all Supabase tables.
+
+## Roadmap — Évolutions du portail GSL
+
+Contexte métier : fiduciaire/révision au Luxembourg (GSL Fiduciaire + GSL Révision), avec perspective portail client à terme.
+
+### Phase 1 — Sécurité critique ✅ DONE (Q2 2026)
+
+| Feature | Statut |
+|---------|--------|
+| MFA/2FA (TOTP) — QR code, enrôlement, vérification post-login, page settings | ✅ Done |
+| Politique de mots de passe — 12 chars, majuscule, chiffre, spécial + indicateur visuel | ✅ Done |
+| Timeout de session — 30 min inactivité, avertissement 2 min avant | ✅ Done |
+| Rate limiting — 5 login / 3 signup / 3 forgot-password par 15 min par IP | ✅ Done |
+| Bandeau MFA dashboard — rappel pour les users sans 2FA | ✅ Done |
+| IP whitelisting admin (optionnel) | ❌ Non implémenté |
+
+### Phase 2 — Expérience collaborateur GSL (cible Q3 2026)
+
+| Feature | Pourquoi | Effort |
+|---------|----------|--------|
+| Notifications email | Admin notifié des demandes d'accès + user notifié quand approuvé | Moyen |
+| Invitations utilisateur | Admin invite jean@gsl.lu avec rôle prédéfini (au lieu d'inscription libre) | Moyen |
+| Recherche et filtres | Recherche dans apps, users, audit log — indispensable quand ça grandit | Faible |
+| Multi-entité GSL | Champ `entity` sur profil (GSL Fiduciaire vs GSL Révision), filtrage apps par entité | Moyen |
+| Icônes des applications | `icon_url` existe en DB mais jamais affiché — afficher les logos sur les tuiles | Faible |
+| i18n (FR/EN/DE) | Le portail mélange anglais et français. Luxembourg = FR + DE + EN | Moyen |
+
+### Phase 3 — Portail client / documents (cible Q4 2026 → Q1 2027)
+
+| Feature | Pourquoi | Effort |
+|---------|----------|--------|
+| Espace client sécurisé | Rôle `client` avec dashboard simplifié, ne voit que ses documents/demandes | Élevé |
+| Upload/download documents | Supabase Storage, chiffrement at-rest, types : PDF, Excel, images | Élevé |
+| Demandes de documents | Workflow : GSL demande → client reçoit email → upload → GSL valide/refuse | Élevé |
+| Signatures électroniques | Intégration LuxTrust ou DocuSign | Élevé |
+| Dossiers par mandat/exercice | Organisation par client, exercice fiscal, type (bilan, TVA, salaires…) | Moyen |
+| Notifications client | Email + in-app pour documents demandés, approuvés, deadlines | Moyen |
+| Audit trail client | Le client voit qui a consulté ses documents et quand | Faible |
+
+### Phase 4 — Ops & monitoring
+
+| Feature | Pourquoi | Effort |
+|---------|----------|--------|
+| Health check endpoint | `/api/health` pour monitoring Vercel/uptime | Faible |
+| Export audit log | CSV/Excel pour auditeurs et compliance | Faible |
+| Analytics dashboard | Connexions/jour, apps les plus utilisées, users inactifs | Moyen |
+| Webhooks | Notifier Slack/Teams lors d'événements critiques | Moyen |
+
+### Planning prévisionnel
+
+- **Q2 2026** → Phase 1 (Sécurité) ✅ + Multi-entité GSL
+- **Q3 2026** → Phase 2 (UX collaborateur) + i18n
+- **Q4 2026** → Phase 3 début (Espace client + Upload documents)
+- **Q1 2027** → Phase 3 suite (Workflows + Signatures)

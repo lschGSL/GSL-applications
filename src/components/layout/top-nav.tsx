@@ -3,13 +3,16 @@
 import { LogOut, User, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSelector } from "@/components/layout/language-selector";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { signOut } from "@/lib/auth/actions";
+import { useI18n } from "@/lib/i18n/context";
 import { useState } from "react";
 import type { Profile } from "@/types/database";
 
 export function TopNav({ profile }: { profile: Profile }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useI18n();
 
   return (
     <>
@@ -28,6 +31,7 @@ export function TopNav({ profile }: { profile: Profile }) {
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageSelector />
           <ThemeToggle />
           <div className="hidden items-center gap-2 text-sm sm:flex">
             <User className="h-4 w-4 text-muted-foreground" />
@@ -38,7 +42,7 @@ export function TopNav({ profile }: { profile: Profile }) {
           <form action={signOut}>
             <Button variant="ghost" size="sm" type="submit">
               <LogOut className="mr-2 h-4 w-4" />
-              Sign out
+              {t("auth.signOut")}
             </Button>
           </form>
         </div>

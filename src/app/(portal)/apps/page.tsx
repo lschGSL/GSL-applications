@@ -10,12 +10,20 @@ export default async function AppsPage() {
   const supabase = await createClient();
   const profile = await getProfile();
 
-  // Fetch all active apps
-  const { data: apps } = await supabase
+  // Fetch all active apps, filtered by user entity
+  const { data: allApps } = await supabase
     .from("applications")
     .select("*")
     .eq("is_active", true)
     .order("name");
+
+  // Filter apps by entity: show apps matching user entity, or apps with no entity restriction
+  const apps = allApps?.filter((app) => {
+    if (!app.entity) return true; // App is for all entities
+    if (!profile?.entity) return true; // User has no entity set, show all
+    if (app.entity === "both" || profile.entity === "both") return true;
+    return app.entity === profile.entity;
+  });
 
   // Fetch user's access
   const { data: access } = await supabase
@@ -46,8 +54,13 @@ export default async function AppsPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <LayoutGrid className="h-6 w-6 text-primary" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                      {app.icon_url ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={app.icon_url} alt="" className="h-12 w-12 object-cover rounded-lg" />
+                      ) : (
+                        <LayoutGrid className="h-6 w-6 text-primary" />
+                      )}
                     </div>
                     <div>
                       <CardTitle className="text-base">{app.name}</CardTitle>
@@ -55,6 +68,11 @@ export default async function AppsPage() {
                         <Badge variant={app.visibility === "external" ? "default" : "secondary"} className="text-xs">
                           {app.visibility}
                         </Badge>
+                        {app.entity && (
+                          <Badge variant="outline" className="text-xs">
+                            {app.entity === "gsl_fiduciaire" ? "Fiduciaire" : app.entity === "gsl_revision" ? "Révision" : "Both"}
+                          </Badge>
+                        )}
                         {hasAccess ? (
                           <Badge variant="success" className="text-xs">Access granted</Badge>
                         ) : (

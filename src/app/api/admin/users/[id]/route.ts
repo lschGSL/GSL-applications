@@ -27,7 +27,7 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const { role, is_active } = body;
+  const { role, is_active, entity } = body;
 
   // Prevent self-demotion
   if (id === user.id && role && role !== "admin") {
@@ -40,6 +40,7 @@ export async function PATCH(
   const updates: Record<string, unknown> = {};
   if (role) updates.role = role;
   if (typeof is_active === "boolean") updates.is_active = is_active;
+  if (entity !== undefined) updates.entity = entity;
 
   const { data, error } = await supabase
     .from("profiles")

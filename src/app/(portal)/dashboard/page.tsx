@@ -120,6 +120,7 @@ export default async function DashboardPage() {
                 name={app?.name || "Unknown"}
                 description={app?.description || "No description"}
                 url={app?.url || ""}
+                iconUrl={app?.icon_url}
               />
               );
             })}

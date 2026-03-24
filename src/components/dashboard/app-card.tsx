@@ -8,10 +8,12 @@ export function AppCard({
   name,
   description,
   url,
+  iconUrl,
 }: {
   name: string;
   description: string;
   url: string;
+  iconUrl?: string | null;
 }) {
   const fullUrl = url && url.trim() ? (url.startsWith("http") ? url : `https://${url}`) : "";
 
@@ -38,8 +40,13 @@ export function AppCard({
     >
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <LayoutGrid className="h-5 w-5 text-primary" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+            {iconUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={iconUrl} alt="" className="h-10 w-10 object-cover rounded-lg" />
+            ) : (
+              <LayoutGrid className="h-5 w-5 text-primary" />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <CardTitle className="text-base flex items-center gap-1.5">

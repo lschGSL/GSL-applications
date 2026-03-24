@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { isAllowedRedirect, isExternalUrl } from "@/lib/utils";
@@ -95,6 +95,28 @@ export async function signUp(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const fullName = formData.get("full_name") as string;
+  const inviteToken = formData.get("invite_token") as string | null;
+
+  // If there's an invite token, validate it
+  let inviteData: { id: string; role: string; entity: string | null } | null = null;
+  if (inviteToken) {
+    const serviceClient = await createServiceClient();
+    const { data: invitation } = await serviceClient
+      .from("invitations")
+      .select("id, role, entity, email, expires_at, accepted_at")
+      .eq("token", inviteToken)
+      .single();
+
+    if (!invitation || invitation.accepted_at || new Date(invitation.expires_at) < new Date()) {
+      return { error: "Invalid or expired invitation" };
+    }
+
+    if (invitation.email !== email) {
+      return { error: "Email does not match invitation" };
+    }
+
+    inviteData = { id: invitation.id, role: invitation.role, entity: invitation.entity };
+  }
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -107,6 +129,26 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  // If invited, update profile with predefined role/entity and mark invitation as accepted
+  if (inviteData) {
+    const serviceClient = await createServiceClient();
+
+    // Mark invitation as accepted
+    await serviceClient
+      .from("invitations")
+      .update({ accepted_at: new Date().toISOString() })
+      .eq("id", inviteData.id);
+
+    // Update profile role/entity (the profile is created by trigger, so we update by email)
+    const updates: Record<string, unknown> = { role: inviteData.role };
+    if (inviteData.entity) updates.entity = inviteData.entity;
+
+    await serviceClient
+      .from("profiles")
+      .update(updates)
+      .eq("email", email);
   }
 
   redirect("/login?message=Check your email to confirm your account");

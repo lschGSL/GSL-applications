@@ -7,12 +7,13 @@ import { formatDate } from "@/lib/utils";
 import { LayoutGrid } from "lucide-react";
 import { AddAppDialog } from "@/components/admin/add-app-dialog";
 import { AppActions } from "@/components/admin/app-actions";
+import { SearchInput } from "@/components/admin/search-input";
 import type { Application } from "@/types/database";
 
 export default async function AdminAppsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ add?: string }>;
+  searchParams: Promise<{ add?: string; q?: string }>;
 }) {
   const profile = await getProfile();
 
@@ -21,11 +22,23 @@ export default async function AdminAppsPage({
   }
 
   const params = await searchParams;
+  const query = params.q?.toLowerCase() ?? "";
+
   const supabase = await createClient();
-  const { data: apps } = await supabase
+  const { data: allApps } = await supabase
     .from("applications")
     .select("*")
     .order("name");
+
+  const apps = query
+    ? allApps?.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query) ||
+          a.slug.toLowerCase().includes(query) ||
+          a.url.toLowerCase().includes(query) ||
+          a.description?.toLowerCase().includes(query)
+      )
+    : allApps;
 
   return (
     <div className="space-y-8">
@@ -38,6 +51,8 @@ export default async function AdminAppsPage({
         </div>
         <AddAppDialog showDialog={params.add === "true"} />
       </div>
+
+      <SearchInput placeholder="Search apps by name, slug, or URL..." />
 
       <Card>
         <CardContent className="p-0">
@@ -52,6 +67,9 @@ export default async function AdminAppsPage({
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Visibility
+                </th>
+                <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Entity
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Status
@@ -69,8 +87,13 @@ export default async function AdminAppsPage({
                 <tr key={app.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                        <LayoutGrid className="h-4 w-4 text-primary" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                        {app.icon_url ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={app.icon_url} alt="" className="h-9 w-9 object-cover rounded-lg" />
+                        ) : (
+                          <LayoutGrid className="h-4 w-4 text-primary" />
+                        )}
                       </div>
                       <div className="min-w-0">
                         <p className="font-medium text-sm truncate">{app.name}</p>
@@ -88,6 +111,15 @@ export default async function AdminAppsPage({
                       {app.visibility}
                     </Badge>
                   </td>
+                  <td className="hidden lg:table-cell px-4 py-4">
+                    {app.entity ? (
+                      <Badge variant="outline" className="text-xs">
+                        {app.entity === "gsl_fiduciaire" ? "Fiduciaire" : app.entity === "gsl_revision" ? "Révision" : "Both"}
+                      </Badge>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">All</span>
+                    )}
+                  </td>
                   <td className="px-4 py-4">
                     <Badge variant={app.is_active ? "success" : "destructive"}>
                       {app.is_active ? "Active" : "Inactive"}
@@ -103,7 +135,7 @@ export default async function AdminAppsPage({
               ))}
               {(!apps || apps.length === 0) && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center">
+                  <td colSpan={7} className="px-4 py-12 text-center">
                     <LayoutGrid className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                     <p className="text-muted-foreground">No applications registered yet.</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">

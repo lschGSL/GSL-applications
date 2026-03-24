@@ -1,19 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { signUp } from "@/lib/auth/actions";
 import { PasswordStrength } from "@/components/security/password-strength";
 import { validatePassword } from "@/lib/password";
 
+interface InviteData {
+  email: string;
+  role: string;
+  entity: string | null;
+}
+
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <Card className="w-full max-w-md">
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    }>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
+  const [invite, setInvite] = useState<InviteData | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const inviteToken = searchParams.get("invite");
+
+  useEffect(() => {
+    if (!inviteToken) return;
+
+    fetch(`/api/invitations/validate?token=${encodeURIComponent(inviteToken)}`)
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json();
+          setInviteError(data.error || "Invalid invitation");
+          return;
+        }
+        const data = await res.json();
+        setInvite(data);
+      })
+      .catch(() => setInviteError("Failed to validate invitation"));
+  }, [inviteToken]);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -35,6 +77,12 @@ export default function RegisterPage() {
       return;
     }
 
+    // If invited, use the invitation email and pass token
+    if (invite && inviteToken) {
+      formData.set("email", invite.email);
+      formData.set("invite_token", inviteToken);
+    }
+
     const result = await signUp(formData);
     if (result?.error) {
       setError(result.error);
@@ -42,13 +90,39 @@ export default function RegisterPage() {
     }
   }
 
+  const entityLabel = invite?.entity === "gsl_fiduciaire" ? "GSL Fiduciaire" : invite?.entity === "gsl_revision" ? "GSL Révision" : invite?.entity === "both" ? "Both entities" : null;
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Create an account</CardTitle>
-        <CardDescription>Join the GSL Portal to access company applications</CardDescription>
+        <CardTitle className="text-2xl">
+          {invite ? "Accept Invitation" : "Create an account"}
+        </CardTitle>
+        <CardDescription>
+          {invite
+            ? `You've been invited to join the GSL Portal`
+            : "Join the GSL Portal to access company applications"
+          }
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        {inviteError && (
+          <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+            {inviteError}
+          </div>
+        )}
+        {invite && (
+          <div className="mb-4 rounded-lg bg-primary/5 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <Mail className="h-4 w-4 text-primary" />
+              <span className="font-medium">{invite.email}</span>
+            </div>
+            <div className="flex gap-2">
+              <Badge variant="secondary" className="capitalize">{invite.role}</Badge>
+              {entityLabel && <Badge variant="outline">{entityLabel}</Badge>}
+            </div>
+          </div>
+        )}
         {error && (
           <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
             {error}
@@ -68,19 +142,21 @@ export default function RegisterPage() {
               autoComplete="name"
             />
           </div>
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@company.com"
-              required
-              autoComplete="email"
-            />
-          </div>
+          {!invite && (
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                Email
+              </label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@company.com"
+                required
+                autoComplete="email"
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
               Password
@@ -112,9 +188,9 @@ export default function RegisterPage() {
               minLength={12}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading || !!inviteError}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create account
+            {invite ? "Accept & Create account" : "Create account"}
           </Button>
         </form>
       </CardContent>

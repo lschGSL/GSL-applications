@@ -28,13 +28,15 @@ export function AddAppDialog({ showDialog }: { showDialog: boolean }) {
     const slug = formData.get("slug") as string;
     const url = formData.get("url") as string;
     const description = formData.get("description") as string;
+    const icon_url = formData.get("icon_url") as string;
     const visibility = formData.get("visibility") as string;
+    const entity = formData.get("entity") as string;
 
     try {
       const res = await fetch("/api/admin/apps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, slug, url, description, visibility }),
+        body: JSON.stringify({ name, slug, url, description, icon_url: icon_url || null, visibility, entity: entity || null }),
       });
 
       if (!res.ok) {
@@ -127,6 +129,16 @@ export function AddAppDialog({ showDialog }: { showDialog: boolean }) {
                   />
                 </div>
                 <div className="space-y-2">
+                  <label htmlFor="app-icon-url" className="text-sm font-medium">Icon URL</label>
+                  <Input
+                    id="app-icon-url"
+                    name="icon_url"
+                    type="url"
+                    placeholder="https://example.com/icon.png"
+                  />
+                  <p className="text-xs text-muted-foreground">Optional icon displayed on app tiles</p>
+                </div>
+                <div className="space-y-2">
                   <label htmlFor="app-visibility" className="text-sm font-medium">Visibility</label>
                   <select
                     id="app-visibility"
@@ -138,6 +150,21 @@ export function AddAppDialog({ showDialog }: { showDialog: boolean }) {
                     <option value="external">External</option>
                     <option value="both">Both</option>
                   </select>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="app-entity" className="text-sm font-medium">Entity</label>
+                  <select
+                    id="app-entity"
+                    name="entity"
+                    defaultValue=""
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <option value="">All entities</option>
+                    <option value="gsl_fiduciaire">GSL Fiduciaire</option>
+                    <option value="gsl_revision">GSL Révision</option>
+                    <option value="both">Both</option>
+                  </select>
+                  <p className="text-xs text-muted-foreground">Restrict this app to a specific GSL entity</p>
                 </div>
                 <div className="flex gap-3 pt-2">
                   <Button type="button" variant="outline" className="flex-1" asChild>
