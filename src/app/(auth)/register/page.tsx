@@ -7,26 +7,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { signUp } from "@/lib/auth/actions";
+import { PasswordStrength } from "@/components/security/password-strength";
+import { validatePassword } from "@/lib/password";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
 
-    const password = formData.get("password") as string;
+    const pw = formData.get("password") as string;
     const confirm = formData.get("confirm_password") as string;
 
-    if (password !== confirm) {
+    if (pw !== confirm) {
       setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
+    const validation = validatePassword(pw);
+    if (!validation.valid) {
+      setError(validation.errors.join(". "));
       setLoading(false);
       return;
     }
@@ -85,11 +89,14 @@ export default function RegisterPage() {
               id="password"
               name="password"
               type="password"
-              placeholder="At least 8 characters"
+              placeholder="Min. 12 characters"
               required
               autoComplete="new-password"
-              minLength={8}
+              minLength={12}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
+            <PasswordStrength password={password} />
           </div>
           <div className="space-y-2">
             <label htmlFor="confirm_password" className="text-sm font-medium">
@@ -102,7 +109,7 @@ export default function RegisterPage() {
               placeholder="Repeat your password"
               required
               autoComplete="new-password"
-              minLength={8}
+              minLength={12}
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>

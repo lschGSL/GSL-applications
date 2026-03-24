@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth/actions";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopNav } from "@/components/layout/top-nav";
+import { SessionTimeout } from "@/components/security/session-timeout";
 import type { Profile } from "@/types/database";
 
 export default async function PortalLayout({
@@ -17,6 +18,7 @@ export default async function PortalLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+      <SessionTimeout />
       <Sidebar profile={profile as Profile} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopNav profile={profile as Profile} />

@@ -12,12 +12,14 @@ import {
   ScrollText,
   Settings,
   Shield,
+  ShieldCheck,
 } from "lucide-react";
 import type { Profile } from "@/types/database";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Applications", href: "/apps", icon: LayoutGrid },
+  { name: "Security", href: "/settings/security", icon: ShieldCheck },
 ];
 
 const adminNavigation = [

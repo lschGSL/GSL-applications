@@ -7,26 +7,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createBrowserClient } from "@supabase/ssr";
+import { PasswordStrength } from "@/components/security/password-strength";
+import { validatePassword } from "@/lib/password";
 
 export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
 
-    const password = formData.get("password") as string;
+    const pw = formData.get("password") as string;
     const confirmPassword = formData.get("confirm_password") as string;
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
+    const validation = validatePassword(pw);
+    if (!validation.valid) {
+      setError(validation.errors.join(". "));
       setLoading(false);
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (pw !== confirmPassword) {
       setError("Passwords do not match");
       setLoading(false);
       return;
@@ -37,7 +41,7 @@ export default function ResetPasswordPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    const { error: updateError } = await supabase.auth.updateUser({ password: pw });
 
     if (updateError) {
       setError(updateError.message);
@@ -71,11 +75,14 @@ export default function ResetPasswordPage() {
               id="password"
               name="password"
               type="password"
-              placeholder="Min. 8 characters"
+              placeholder="Min. 12 characters"
               required
-              minLength={8}
+              minLength={12}
               autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
+            <PasswordStrength password={password} />
           </div>
           <div className="space-y-2">
             <label htmlFor="confirm_password" className="text-sm font-medium">
@@ -87,7 +94,7 @@ export default function ResetPasswordPage() {
               type="password"
               placeholder="Repeat your password"
               required
-              minLength={8}
+              minLength={12}
               autoComplete="new-password"
             />
           </div>
