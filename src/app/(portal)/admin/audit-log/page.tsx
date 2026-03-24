@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { ScrollText } from "lucide-react";
 import { AuditLogPagination } from "@/components/admin/audit-log-pagination";
+import type { AuditLog } from "@/types/database";
 
 const PAGE_SIZE = 25;
 
@@ -90,7 +91,7 @@ export default async function AuditLogPage({
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {logs?.map((log: any) => (
+                {logs?.map((log: AuditLog & { profiles?: { email?: string; full_name?: string } }) => (
                   <tr key={log.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-6 py-4 text-sm text-muted-foreground whitespace-nowrap">
                       {formatDate(log.created_at)}
