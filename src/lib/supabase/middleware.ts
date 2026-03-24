@@ -35,6 +35,20 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // Handle Supabase auth errors (e.g. expired reset link redirected to /)
+  const errorCode = request.nextUrl.searchParams.get("error_code");
+  if (errorCode && request.nextUrl.pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    if (errorCode === "otp_expired") {
+      url.searchParams.set("message", "Le lien de réinitialisation a expiré. Veuillez en demander un nouveau.");
+    } else {
+      url.searchParams.set("message", "Une erreur est survenue. Veuillez réessayer.");
+    }
+    return NextResponse.redirect(url);
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -51,8 +65,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages (but allow /auth/exchange to process tokens)
-  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange")) {
+  // Redirect authenticated users away from auth pages (but allow /auth/exchange and /reset-password)
+  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange") && !request.nextUrl.pathname.startsWith("/reset-password")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";
