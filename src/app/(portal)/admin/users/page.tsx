@@ -1,14 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserActions } from "@/components/admin/user-actions";
 import { SearchInput } from "@/components/admin/search-input";
 import { InviteUserDialog } from "@/components/admin/invite-user-dialog";
-import { getInitials, formatDate } from "@/lib/utils";
-import type { Profile } from "@/types/database";
+import { UsersTable } from "@/components/admin/users-table";
 
 export default async function UsersPage({
   searchParams,
@@ -39,13 +35,6 @@ export default async function UsersPage({
       )
     : allUsers;
 
-  const roleColors: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-    admin: "destructive",
-    manager: "default",
-    member: "secondary",
-    viewer: "outline",
-  };
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -63,83 +52,7 @@ export default async function UsersPage({
 
       <SearchInput placeholder="Search users by name, email, or role..." />
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Role
-                  </th>
-                  <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Entity
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Joined
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {users?.map((user: Profile) => (
-                  <tr key={user.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          {user.avatar_url && <AvatarImage src={user.avatar_url} />}
-                          <AvatarFallback className="text-xs">
-                            {getInitials(user.full_name || user.email)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {user.full_name || "No name"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{user.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge variant={roleColors[user.role] ?? "secondary"} className="capitalize">
-                        {user.role}
-                      </Badge>
-                    </td>
-                    <td className="hidden md:table-cell px-6 py-4">
-                      {user.entity ? (
-                        <Badge variant="outline" className="text-xs">
-                          {user.entity === "gsl_fiduciaire" ? "Fiduciaire" : user.entity === "gsl_revision" ? "Révision" : "Both"}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge variant={user.is_active ? "success" : "destructive"}>
-                        {user.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {formatDate(user.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <UserActions user={user} currentUserId={profile.id} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      <UsersTable users={users ?? []} currentUserId={profile.id} />
     </div>
   );
 }
