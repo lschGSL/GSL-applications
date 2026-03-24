@@ -98,14 +98,17 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-semibold mb-4">Your Applications</h2>
         {userApps && userApps.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {userApps.map((access: any) => (
+            {userApps.map((access) => {
+              const app = Array.isArray(access.applications) ? access.applications[0] : access.applications;
+              return (
               <AppCard
                 key={access.app_id}
-                name={access.applications?.name || "Unknown"}
-                description={access.applications?.description || "No description"}
-                url={access.applications?.url || ""}
+                name={app?.name || "Unknown"}
+                description={app?.description || "No description"}
+                url={app?.url || ""}
               />
-            ))}
+              );
+            })}
           </div>
         ) : (
           <Card>

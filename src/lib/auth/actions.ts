@@ -4,12 +4,33 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { isAllowedRedirect, isExternalUrl } from "@/lib/utils";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function signIn(formData: FormData) {
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") || "unknown";
+  const email = formData.get("email") as string;
+
+  // Rate limit: 5 attempts per IP per 15 minutes
+  const ipLimit = checkRateLimit(`signin:ip:${ip}`, 5, 15 * 60 * 1000);
+  if (!ipLimit.allowed) {
+    return {
+      error: `Too many login attempts. Please try again in ${ipLimit.retryAfterSeconds} seconds.`,
+    };
+  }
+
+  // Rate limit: 5 attempts per email per 15 minutes
+  const emailLimit = checkRateLimit(`signin:email:${email}`, 5, 15 * 60 * 1000);
+  if (!emailLimit.allowed) {
+    return {
+      error: `Too many login attempts for this account. Please try again in ${emailLimit.retryAfterSeconds} seconds.`,
+    };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
-    email: formData.get("email") as string,
+    email,
     password: formData.get("password") as string,
   });
 
@@ -17,17 +38,30 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
+  // Check if user has MFA enrolled
+  const { data: factorsData } = await supabase.auth.mfa.listFactors();
+  const hasVerifiedTOTP =
+    factorsData?.totp?.some((f) => f.status === "verified") ?? false;
+
   // Log the sign-in
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
-    const headersList = await headers();
     await supabase.from("audit_logs").insert({
       user_id: user.id,
       action: "sign_in",
       resource_type: "auth",
-      ip_address: headersList.get("x-forwarded-for") || "unknown",
+      ip_address: ip,
       user_agent: headersList.get("user-agent"),
     });
+  }
+
+  // If MFA is enrolled, redirect to verification page
+  if (hasVerifiedTOTP) {
+    const redirectTo = formData.get("redirect") as string;
+    const mfaRedirect = redirectTo
+      ? `/mfa-verify?redirect=${encodeURIComponent(redirectTo)}`
+      : "/mfa-verify";
+    redirect(mfaRedirect);
   }
 
   const redirectTo = formData.get("redirect") as string;
@@ -45,6 +79,17 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") || "unknown";
+
+  // Rate limit: 3 sign-ups per IP per 15 minutes
+  const limit = checkRateLimit(`signup:ip:${ip}`, 3, 15 * 60 * 1000);
+  if (!limit.allowed) {
+    return {
+      error: `Too many registration attempts. Please try again in ${limit.retryAfterSeconds} seconds.`,
+    };
+  }
+
   const supabase = await createClient();
 
   const email = formData.get("email") as string;
@@ -87,11 +132,21 @@ export async function signOut() {
 }
 
 export async function forgotPassword(formData: FormData) {
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") || "unknown";
+
+  // Rate limit: 3 requests per IP per 15 minutes
+  const limit = checkRateLimit(`forgot:ip:${ip}`, 3, 15 * 60 * 1000);
+  if (!limit.allowed) {
+    return {
+      error: `Too many requests. Please try again in ${limit.retryAfterSeconds} seconds.`,
+    };
+  }
+
   const supabase = await createClient();
 
   // Build the redirect URL from the request headers so it works
   // regardless of whether NEXT_PUBLIC_APP_URL is configured.
-  const headersList = await headers();
   const host = headersList.get("host") ?? "gsl-applications.vercel.app";
   const proto = headersList.get("x-forwarded-proto") ?? "https";
   const appUrl = `${proto}://${host}`;
