@@ -1,8 +1,12 @@
-export type UserRole = "admin" | "manager" | "member" | "viewer";
+export type UserRole = "admin" | "manager" | "member" | "viewer" | "client";
 
 export type AppVisibility = "internal" | "external" | "both";
 
 export type GslEntity = "gsl_fiduciaire" | "gsl_revision" | "both";
+
+export type DocumentStatus = "pending" | "approved" | "rejected";
+
+export type FolderType = "bilan" | "tva" | "salaires" | "general" | "other";
 
 export interface Profile {
   id: string;
@@ -66,4 +70,38 @@ export interface Invitation {
   // Joined
   inviter_name?: string;
   inviter_email?: string;
+}
+
+export interface DocumentFolder {
+  id: string;
+  name: string;
+  client_id: string;
+  parent_id: string | null;
+  type: FolderType | null;
+  exercise_year: number | null;
+  created_at: string;
+  updated_at: string;
+  // Joined
+  document_count?: number;
+}
+
+export interface Document {
+  id: string;
+  name: string;
+  file_path: string;
+  file_size: number;
+  mime_type: string;
+  client_id: string;
+  uploaded_by: string;
+  folder_id: string | null;
+  status: DocumentStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  uploader_name?: string;
+  uploader_email?: string;
+  client_name?: string;
+  client_email?: string;
+  folder_name?: string;
 }

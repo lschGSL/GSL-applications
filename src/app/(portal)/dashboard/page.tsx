@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,12 @@ import { MfaBanner } from "@/components/dashboard/mfa-banner";
 export default async function DashboardPage() {
   const supabase = await createClient();
   const profile = await getProfile();
+
+  // Redirect clients to their documents page
+  if (profile?.role === "client") {
+    redirect("/client/documents");
+  }
+
   const isAdmin = profile?.role === "admin" || profile?.role === "manager";
 
   // Fetch stats and apps
