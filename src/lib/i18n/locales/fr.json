@@ -269,6 +269,26 @@
     "approved": "Approuvé",
     "rejected": "Rejeté"
   },
+  "requests": {
+    "title": "Demandes de documents",
+    "createRequest": "Demander un document",
+    "noRequests": "Aucune demande de document.",
+    "send": "Envoyer la demande",
+    "sent": "Demande envoyee avec succes !",
+    "cancel": "Annuler la demande",
+    "dueDate": "Date limite",
+    "uploadResponse": "Fournir le document",
+    "documentTitle": "Titre du document",
+    "titlePlaceholder": "ex. Bilan 2025",
+    "descPlaceholder": "Description du document demande...",
+    "status": {
+      "pending": "En attente",
+      "uploaded": "Fourni",
+      "approved": "Approuve",
+      "rejected": "Rejete",
+      "cancelled": "Annule"
+    }
+  },
   "roles": {
     "admin": "Admin",
     "manager": "Manager",

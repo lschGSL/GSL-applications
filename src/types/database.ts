@@ -6,6 +6,8 @@ export type GslEntity = "gsl_fiduciaire" | "gsl_revision" | "both";
 
 export type DocumentStatus = "pending" | "approved" | "rejected";
 
+export type RequestStatus = "pending" | "uploaded" | "approved" | "rejected" | "cancelled";
+
 export type FolderType = "bilan" | "tva" | "salaires" | "general" | "other";
 
 export interface Profile {
@@ -104,4 +106,23 @@ export interface Document {
   client_name?: string;
   client_email?: string;
   folder_name?: string;
+}
+
+export interface DocumentRequest {
+  id: string;
+  client_id: string;
+  requested_by: string;
+  title: string;
+  description: string | null;
+  folder_id: string | null;
+  document_id: string | null;
+  status: RequestStatus;
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  client_name?: string;
+  client_email?: string;
+  requester_name?: string;
+  requester_email?: string;
 }

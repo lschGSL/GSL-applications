@@ -7,12 +7,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  X, Mail, Calendar, FolderPlus, Loader2,
+  X, Mail, Calendar, FolderPlus, Loader2, Send,
 } from "lucide-react";
 import { getInitials, formatDate } from "@/lib/utils";
 import { DocumentBrowser } from "@/components/documents/document-browser";
+import { RequestList } from "@/components/documents/request-list";
+import { CreateRequestDialog } from "@/components/admin/create-request-dialog";
 import { useI18n } from "@/lib/i18n/context";
-import type { Profile, DocumentFolder, Document as DocType } from "@/types/database";
+import type { Profile, DocumentFolder, Document as DocType, DocumentRequest } from "@/types/database";
 
 export function ClientDetailPanel({
   client,
@@ -23,20 +25,24 @@ export function ClientDetailPanel({
 }) {
   const [folders, setFolders] = useState<DocumentFolder[]>([]);
   const [documents, setDocuments] = useState<DocType[]>([]);
+  const [requests, setRequests] = useState<DocumentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [showCreateRequest, setShowCreateRequest] = useState(false);
   const [folderLoading, setFolderLoading] = useState(false);
   const { t } = useI18n();
 
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [fRes, dRes] = await Promise.all([
+      const [fRes, dRes, rRes] = await Promise.all([
         fetch(`/api/documents/folders?client_id=${client.id}`),
         fetch(`/api/documents?client_id=${client.id}`),
+        fetch(`/api/documents/requests?client_id=${client.id}`),
       ]);
       if (fRes.ok) setFolders(await fRes.json());
       if (dRes.ok) setDocuments(await dRes.json());
+      if (rRes.ok) setRequests(await rRes.json());
       setLoading(false);
     }
     load();
@@ -109,11 +115,15 @@ export function ClientDetailPanel({
             </div>
           </div>
 
-          {/* Create folder */}
+          {/* Actions */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setShowCreateFolder(!showCreateFolder)}>
               <FolderPlus className="mr-1.5 h-3.5 w-3.5" />
               {t("documents.createFolder")}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowCreateRequest(true)}>
+              <Send className="mr-1.5 h-3.5 w-3.5" />
+              {t("requests.createRequest")}
             </Button>
           </div>
 
@@ -147,6 +157,22 @@ export function ClientDetailPanel({
                 </form>
               </CardContent>
             </Card>
+          )}
+
+          {/* Document requests */}
+          {!loading && requests.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold mb-3">{t("requests.title")}</h3>
+              <RequestList requests={requests} clientId={client.id} isAdmin />
+            </div>
+          )}
+
+          {showCreateRequest && (
+            <CreateRequestDialog
+              clientId={client.id}
+              folders={folders}
+              onClose={() => setShowCreateRequest(false)}
+            />
           )}
 
           {/* Document browser */}

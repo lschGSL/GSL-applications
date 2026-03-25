@@ -269,6 +269,26 @@
     "approved": "Genehmigt",
     "rejected": "Abgelehnt"
   },
+  "requests": {
+    "title": "Dokumentenanfragen",
+    "createRequest": "Dokument anfordern",
+    "noRequests": "Keine Dokumentenanfragen.",
+    "send": "Anfrage senden",
+    "sent": "Anfrage erfolgreich gesendet!",
+    "cancel": "Anfrage abbrechen",
+    "dueDate": "Falligkeitsdatum",
+    "uploadResponse": "Dokument bereitstellen",
+    "documentTitle": "Dokumenttitel",
+    "titlePlaceholder": "z.B. Bilanz 2025",
+    "descPlaceholder": "Beschreibung des angeforderten Dokuments...",
+    "status": {
+      "pending": "Ausstehend",
+      "uploaded": "Hochgeladen",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Abgebrochen"
+    }
+  },
   "roles": {
     "admin": "Admin",
     "manager": "Manager",
