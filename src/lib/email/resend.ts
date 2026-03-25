@@ -104,6 +104,50 @@ export async function sendAccessRevokedNotification({
   });
 }
 
+export async function sendDocumentRequestNotification({
+  clientEmail,
+  clientName,
+  requesterName,
+  title,
+  description,
+  dueDate,
+  portalUrl,
+}: {
+  clientEmail: string;
+  clientName: string;
+  requesterName: string;
+  title: string;
+  description?: string | null;
+  dueDate?: string | null;
+  portalUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  const dueDateStr = dueDate ? new Date(dueDate).toLocaleDateString("fr-FR") : null;
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [clientEmail],
+    subject: `[${APP_NAME}] Document demandé : ${title}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1a1a1a;">Document demandé</h2>
+        <p>Bonjour <strong>${clientName}</strong>,</p>
+        <p><strong>${requesterName}</strong> vous a demandé de fournir le document suivant :</p>
+        <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 16px 0;">
+          <p style="margin: 0; font-weight: bold;">${title}</p>
+          ${description ? `<p style="margin: 8px 0 0; color: #666;">${description}</p>` : ""}
+          ${dueDateStr ? `<p style="margin: 8px 0 0; color: #e62a34;"><strong>Date limite :</strong> ${dueDateStr}</p>` : ""}
+        </div>
+        <p><a href="${portalUrl}/client/documents" style="display: inline-block; padding: 10px 20px; background: #0070f3; color: white; text-decoration: none; border-radius: 6px;">Accéder à mes documents</a></p>
+        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
+        <p style="color: #666; font-size: 12px;">${APP_NAME}</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendInvitationEmail({
   email,
   invitedBy,

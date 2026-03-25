@@ -269,6 +269,26 @@
     "approved": "Approved",
     "rejected": "Rejected"
   },
+  "requests": {
+    "title": "Document Requests",
+    "createRequest": "Request Document",
+    "noRequests": "No document requests.",
+    "send": "Send Request",
+    "sent": "Request sent successfully!",
+    "cancel": "Cancel Request",
+    "dueDate": "Due date",
+    "uploadResponse": "Upload Document",
+    "documentTitle": "Document title",
+    "titlePlaceholder": "e.g. Balance sheet 2025",
+    "descPlaceholder": "Description of the requested document...",
+    "status": {
+      "pending": "Pending",
+      "uploaded": "Uploaded",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    }
+  },
   "roles": {
     "admin": "Admin",
     "manager": "Manager",
