@@ -82,7 +82,9 @@
     "userManagement": "Gestion des utilisateurs",
     "appManagement": "Gestion des applications",
     "auditLog": "Journal d'audit",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "clientManagement": "Gestion des clients",
+    "myDocuments": "Mes documents"
   },
   "landing": {
     "heroTitle1": "Vos applications,",
@@ -243,11 +245,36 @@
     "gslRevision": "GSL Révision",
     "gslBoth": "GSL Fiduciaire & GSL Révision"
   },
+  "documents": {
+    "title": "Documents",
+    "upload": "Téléverser",
+    "uploadDocument": "Téléverser un document",
+    "download": "Télécharger",
+    "folders": "Dossiers",
+    "allFiles": "Tous les fichiers",
+    "noDocuments": "Aucun document pour le moment.",
+    "noFolders": "Aucun dossier pour le moment.",
+    "createFolder": "Créer un dossier",
+    "folderName": "Nom du dossier",
+    "exerciseYear": "Année d'exercice",
+    "dragDrop": "Glissez-déposez ou cliquez pour sélectionner",
+    "maxSize": "Taille maximale : 50 Mo",
+    "allowedTypes": "PDF, Excel, PNG, JPEG",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "addNote": "Ajouter une note...",
+    "uploadedBy": "Téléversé par",
+    "uploadedOn": "Téléversé le",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté"
+  },
   "roles": {
     "admin": "Admin",
     "manager": "Manager",
     "member": "Membre",
-    "viewer": "Lecteur"
+    "viewer": "Lecteur",
+    "client": "Client"
   },
   "security": {
     "title": "Sécurité",

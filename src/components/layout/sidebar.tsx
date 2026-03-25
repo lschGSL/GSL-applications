@@ -6,10 +6,12 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Users,
+  Users2,
   ScrollText,
   Settings,
   Shield,
   ShieldCheck,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -23,15 +25,23 @@ const navigation = [
 
 const adminNavigation = [
   { key: "nav.userManagement", href: "/admin/users", icon: Users },
+  { key: "nav.clientManagement", href: "/admin/clients", icon: Users2 },
   { key: "nav.appManagement", href: "/admin/apps", icon: Shield },
   { key: "nav.auditLog", href: "/admin/audit-log", icon: ScrollText },
   { key: "nav.settings", href: "/admin/settings", icon: Settings },
+];
+
+const clientNavigation = [
+  { key: "nav.myDocuments", href: "/client/documents", icon: FileText },
+  { key: "nav.security", href: "/settings/security", icon: ShieldCheck },
 ];
 
 export function Sidebar({ profile }: { profile: Profile }) {
   const pathname = usePathname();
   const { t } = useI18n();
   const isAdmin = profile.role === "admin" || profile.role === "manager";
+  const isClient = profile.role === "client";
+  const navItems = isClient ? clientNavigation : navigation;
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-sidebar-background lg:flex">
@@ -50,7 +60,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
         <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
           {t("nav.main")}
         </div>
-        {navigation.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
