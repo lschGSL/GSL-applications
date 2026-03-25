@@ -7,14 +7,32 @@ import { formatDate } from "@/lib/utils";
 import { ScrollText } from "lucide-react";
 import { AuditLogPagination } from "@/components/admin/audit-log-pagination";
 import { SearchInput } from "@/components/admin/search-input";
+import { FilterBar } from "@/components/admin/filter-bar";
 import type { AuditLog } from "@/types/database";
 
 const PAGE_SIZE = 25;
 
+const auditFilters = [
+  {
+    key: "action",
+    label: "Action",
+    options: [
+      { value: "sign_in", label: "Sign in" },
+      { value: "sign_out", label: "Sign out" },
+      { value: "request_access", label: "Request" },
+      { value: "grant_access", label: "Grant" },
+      { value: "revoke_access", label: "Revoke" },
+      { value: "create", label: "Create" },
+      { value: "update", label: "Update" },
+      { value: "delete", label: "Delete" },
+    ],
+  },
+];
+
 export default async function AuditLogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; q?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; action?: string }>;
 }) {
   const profile = await getProfile();
 
@@ -24,11 +42,12 @@ export default async function AuditLogPage({
 
   const params = await searchParams;
   const query = params.q?.toLowerCase() ?? "";
+  const actionFilter = params.action ?? "";
   const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
 
   const supabase = await createClient();
 
-  // Build query - fetch all logs for filtering, or paginated if no search
+  // Build query
   let logsQuery = supabase
     .from("audit_logs")
     .select(`
@@ -37,30 +56,41 @@ export default async function AuditLogPage({
     `)
     .order("created_at", { ascending: false });
 
-  // If filtering by action, use Supabase filter
+  // Filter by action type at DB level
+  if (actionFilter) {
+    logsQuery = logsQuery.eq("action", actionFilter);
+  }
+
+  // If text search, fetch more for client-side filtering
   if (query) {
-    // Fetch more results for client-side filtering since we can't ilike on joined columns
     logsQuery = logsQuery.limit(500);
   }
 
-  const { data: allLogs } = query ? await logsQuery : await logsQuery.range(
-    (currentPage - 1) * PAGE_SIZE,
-    (currentPage - 1) * PAGE_SIZE + PAGE_SIZE - 1
-  );
+  const { data: allLogs } = query
+    ? await logsQuery
+    : await logsQuery.range(
+        (currentPage - 1) * PAGE_SIZE,
+        (currentPage - 1) * PAGE_SIZE + PAGE_SIZE - 1
+      );
 
-  // Get total count
-  const { count: totalCount } = await supabase
+  // Get total count (with action filter if applied)
+  let countQuery = supabase
     .from("audit_logs")
     .select("*", { count: "exact", head: true });
+  if (actionFilter) {
+    countQuery = countQuery.eq("action", actionFilter);
+  }
+  const { count: totalCount } = await countQuery;
 
-  // Filter client-side if search query exists
+  // Client-side text search
   const filteredLogs = query
-    ? allLogs?.filter((log: AuditLog & { profiles?: { email?: string; full_name?: string } }) =>
-        log.action.toLowerCase().includes(query) ||
-        log.resource_type.toLowerCase().includes(query) ||
-        log.profiles?.email?.toLowerCase().includes(query) ||
-        log.profiles?.full_name?.toLowerCase().includes(query) ||
-        log.ip_address?.includes(query)
+    ? allLogs?.filter(
+        (log: AuditLog & { profiles?: { email?: string; full_name?: string } }) =>
+          log.action.toLowerCase().includes(query) ||
+          log.resource_type.toLowerCase().includes(query) ||
+          log.profiles?.email?.toLowerCase().includes(query) ||
+          log.profiles?.full_name?.toLowerCase().includes(query) ||
+          log.ip_address?.includes(query)
       )
     : allLogs;
 
@@ -94,7 +124,10 @@ export default async function AuditLogPage({
         <Badge variant="secondary">{totalItems} events</Badge>
       </div>
 
-      <SearchInput placeholder="Search by user, action, resource, or IP..." />
+      <div className="space-y-3">
+        <SearchInput placeholder="Search by user, action, resource, or IP..." />
+        <FilterBar filters={auditFilters} />
+      </div>
 
       <Card>
         <CardContent className="p-0">
@@ -146,7 +179,7 @@ export default async function AuditLogPage({
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center">
                       <ScrollText className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                      <p className="text-muted-foreground">No audit log entries yet.</p>
+                      <p className="text-muted-foreground">No audit log entries found.</p>
                     </td>
                   </tr>
                 )}

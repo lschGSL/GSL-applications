@@ -5,10 +5,30 @@ import { Badge } from "@/components/ui/badge";
 import { LayoutGrid } from "lucide-react";
 import { RequestAccessButton } from "@/components/apps/request-access-button";
 import { OpenAppButton } from "@/components/apps/open-app-button";
+import { SearchInput } from "@/components/admin/search-input";
+import { FilterBar } from "@/components/admin/filter-bar";
 
-export default async function AppsPage() {
+const accessFilters = [
+  {
+    key: "access",
+    label: "Access",
+    options: [
+      { value: "granted", label: "Granted" },
+      { value: "none", label: "No access" },
+    ],
+  },
+];
+
+export default async function AppsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; access?: string }>;
+}) {
   const supabase = await createClient();
   const profile = await getProfile();
+  const params = await searchParams;
+  const query = params.q?.toLowerCase() ?? "";
+  const accessFilter = params.access ?? "";
 
   // Fetch all active apps, filtered by user entity
   const { data: allApps } = await supabase
@@ -18,9 +38,9 @@ export default async function AppsPage() {
     .order("name");
 
   // Filter apps by entity: show apps matching user entity, or apps with no entity restriction
-  const apps = allApps?.filter((app) => {
-    if (!app.entity) return true; // App is for all entities
-    if (!profile?.entity) return true; // User has no entity set, show all
+  const entityFilteredApps = allApps?.filter((app) => {
+    if (!app.entity) return true;
+    if (!profile?.entity) return true;
     if (app.entity === "both" || profile.entity === "both") return true;
     return app.entity === profile.entity;
   });
@@ -34,13 +54,41 @@ export default async function AppsPage() {
   const accessibleAppIds = new Set(access?.map((a) => a.app_id) ?? []);
   const isAdmin = profile?.role === "admin" || profile?.role === "manager";
 
+  // Apply text search
+  const searchedApps = query
+    ? entityFilteredApps?.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query) ||
+          a.description?.toLowerCase().includes(query) ||
+          a.url.toLowerCase().includes(query)
+      )
+    : entityFilteredApps;
+
+  // Apply access filter
+  const apps = accessFilter
+    ? searchedApps?.filter((app) => {
+        const hasAccess = isAdmin || accessibleAppIds.has(app.id);
+        if (accessFilter === "granted") return hasAccess;
+        if (accessFilter === "none") return !hasAccess;
+        return true;
+      })
+    : searchedApps;
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Applications</h1>
-        <p className="text-muted-foreground mt-1">
-          Browse and access company applications.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Applications</h1>
+          <p className="text-muted-foreground mt-1">
+            Browse and access company applications.
+          </p>
+        </div>
+        <Badge variant="secondary">{apps?.length ?? 0} apps</Badge>
+      </div>
+
+      <div className="space-y-3">
+        <SearchInput placeholder="Search apps by name or description..." />
+        <FilterBar filters={accessFilters} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -101,7 +149,7 @@ export default async function AppsPage() {
           <Card className="col-span-full">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <LayoutGrid className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <p className="text-muted-foreground">No applications configured yet.</p>
+              <p className="text-muted-foreground">No applications found.</p>
             </CardContent>
           </Card>
         )}
