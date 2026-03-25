@@ -18,7 +18,14 @@
     "page": "Seite",
     "of": "von",
     "noResults": "Keine Ergebnisse gefunden.",
-    "comingSoon": "Demnächst verfügbar"
+    "comingSoon": "Demnächst verfügbar",
+    "current": "Aktuell",
+    "you": "Sie",
+    "noName": "Kein Name",
+    "networkError": "Netzwerkfehler",
+    "viaVercel": "Über Vercel",
+    "getStarted": "Loslegen",
+    "dismiss": "Schließen"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -26,16 +33,45 @@
     "signUp": "Konto erstellen",
     "email": "E-Mail",
     "password": "Passwort",
+    "newPassword": "Neues Passwort",
     "confirmPassword": "Passwort bestätigen",
     "fullName": "Vollständiger Name",
     "forgotPassword": "Passwort vergessen?",
     "resetPassword": "Passwort zurücksetzen",
+    "sendResetLink": "Link senden",
+    "backToLogin": "Zurück zur Anmeldung",
     "noAccount": "Noch kein Konto?",
     "hasAccount": "Bereits ein Konto?",
     "checkEmail": "Überprüfen Sie Ihre E-Mail, um Ihr Konto zu bestätigen",
     "acceptInvitation": "Einladung annehmen",
     "acceptAndCreate": "Annehmen und Konto erstellen",
-    "invitedToJoin": "Sie wurden eingeladen, dem GSL-Portal beizutreten"
+    "createAccount": "Konto erstellen",
+    "invitedToJoin": "Sie wurden eingeladen, dem GSL-Portal beizutreten",
+    "joinPortal": "Treten Sie dem GSL-Portal bei, um auf Unternehmensanwendungen zuzugreifen",
+    "invalidInvitation": "Ungültige Einladung",
+    "failedValidateInvite": "Einladung konnte nicht überprüft werden",
+    "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+    "minChars": "Mind. 12 Zeichen",
+    "repeatPassword": "Passwort wiederholen",
+    "updatePassword": "Passwort aktualisieren",
+    "setNewPassword": "Neues Passwort festlegen",
+    "enterNewPassword": "Geben Sie Ihr neues Passwort ein",
+    "enterEmail": "Geben Sie Ihre E-Mail ein und wir senden Ihnen einen Link zum Zurücksetzen",
+    "welcomeBack": "Willkommen zurück",
+    "signInToAccount": "Melden Sie sich bei Ihrem GSL-Portal-Konto an",
+    "enterPassword": "Passwort eingeben",
+    "emailPlaceholder": "sie@unternehmen.com",
+    "namePlaceholder": "Max Mustermann",
+    "passwordUpdated": "Passwort erfolgreich aktualisiert"
+  },
+  "mfa": {
+    "title": "Zwei-Faktor-Authentifizierung",
+    "subtitle": "Geben Sie den 6-stelligen Code Ihrer Authentifizierungs-App ein",
+    "enter6Digits": "Bitte geben Sie einen 6-stelligen Code ein",
+    "verify": "Bestätigen",
+    "banner": "Sichern Sie Ihr Konto mit Zwei-Faktor-Authentifizierung",
+    "bannerDesc": "Schützen Sie Ihr Konto durch Aktivierung von 2FA. Es dauert nur eine Minute und bietet zusätzliche Sicherheit.",
+    "setup": "2FA aktivieren"
   },
   "nav": {
     "main": "Hauptmenü",
@@ -47,6 +83,23 @@
     "appManagement": "App-Verwaltung",
     "auditLog": "Audit-Protokoll",
     "settings": "Einstellungen"
+  },
+  "landing": {
+    "heroTitle1": "Ihre Anwendungen,",
+    "heroTitle2": "ein Portal.",
+    "heroDesc": "Das GSL-Portal bietet zentralen Zugriff auf alle Unternehmensanwendungen mit Sicherheit auf Enterprise-Niveau, rollenbasierter Zugriffskontrolle und umfassender Audit-Protokollierung.",
+    "featureSecurity": "Enterprise-Sicherheit",
+    "featureSecurityDesc": "Multi-Faktor-Authentifizierung, Sicherheit auf Zeilenebene, verschlüsselte Verbindungen und Sicherheitsheader standardmäßig.",
+    "featureUsers": "Benutzerverwaltung",
+    "featureUsersDesc": "Rollenbasierte Zugriffskontrolle mit anwendungsspezifischen Berechtigungen. Vollständiger Audit-Trail aller Benutzeraktionen.",
+    "featureApps": "App-Hub",
+    "featureAppsDesc": "Zentrales Dashboard für den Zugriff auf alle internen und externen Anwendungen. Eine Anmeldung, alle Ihre Tools.",
+    "tagline": "fiduciaire | révision | management",
+    "footerAbout": "Über uns",
+    "footerNews": "Nachrichten",
+    "footerContact": "Kontakt",
+    "footerPortal": "Portal",
+    "footerCopyright": "Alle Rechte vorbehalten © {year} GSL Luxemburg"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -63,13 +116,19 @@
   "apps": {
     "title": "Anwendungen",
     "subtitle": "Durchsuchen Sie die Unternehmensanwendungen und greifen Sie darauf zu.",
-    "noApps": "Noch keine Anwendungen konfiguriert.",
+    "noApps": "Keine Anwendungen gefunden.",
+    "noAppsConfigured": "Noch keine Anwendungen konfiguriert.",
     "accessGranted": "Zugang gewährt",
     "noAccess": "Kein Zugang",
+    "granted": "Gewährt",
     "requestAccess": "Zugang anfordern",
     "requestSent": "Anfrage gesendet",
+    "requestFailed": "Anfrage konnte nicht gesendet werden",
     "openApplication": "Anwendung öffnen",
-    "urlNotConfigured": "URL nicht konfiguriert"
+    "urlNotConfigured": "URL nicht konfiguriert",
+    "noDescription": "Keine Beschreibung verfügbar.",
+    "searchPlaceholder": "Nach Name oder Beschreibung suchen...",
+    "count": "{count} Apps"
   },
   "admin": {
     "users": {
@@ -81,13 +140,24 @@
       "role": "Rolle",
       "entity": "Entität",
       "joined": "Beigetreten",
+      "lastUpdated": "Zuletzt aktualisiert",
       "changeRole": "Rolle ändern",
       "deactivate": "Deaktivieren",
       "activate": "Aktivieren",
+      "deactivateAccount": "Konto deaktivieren",
+      "activateAccount": "Konto aktivieren",
+      "accountStatus": "Kontostatus",
       "inviteUser": "Benutzer einladen",
       "inviteTitle": "Benutzer einladen",
       "inviteSent": "Einladung erfolgreich gesendet!",
-      "sendInvitation": "Einladung senden"
+      "sendInvitation": "Einladung senden",
+      "noUsers": "Keine Benutzer gefunden.",
+      "userDetails": "Benutzerdetails",
+      "cannotChangeOwnRole": "Sie können Ihre eigene Rolle nicht ändern.",
+      "cannotDeactivateOwn": "Sie können Ihr eigenes Konto nicht deaktivieren.",
+      "noEntity": "Keine Entität",
+      "noEntityAssigned": "Keine Entität zugewiesen",
+      "count": "{count} Benutzer"
     },
     "apps": {
       "title": "App-Verwaltung",
@@ -95,22 +165,40 @@
       "addApp": "Anwendung hinzufügen",
       "registerApp": "Anwendung registrieren",
       "editApp": "Anwendung bearbeiten",
+      "appDetails": "Anwendungsdetails",
       "saveChanges": "Änderungen speichern",
       "searchPlaceholder": "Nach Name, Slug oder URL suchen...",
       "application": "Anwendung",
       "slug": "Slug",
       "visibility": "Sichtbarkeit",
       "created": "Erstellt",
+      "lastUpdated": "Zuletzt aktualisiert",
       "noApps": "Noch keine Anwendungen registriert.",
-      "addFirst": "Klicken Sie auf 'Anwendung hinzufuegen', um Ihre erste App zu registrieren.",
+      "addFirst": "Klicken Sie auf \"Anwendung hinzufügen\", um Ihre erste App zu registrieren.",
       "name": "Name",
       "url": "URL",
       "description": "Beschreibung",
       "iconUrl": "Icon-URL",
+      "icon": "Icon",
       "iconHint": "Optionales Icon auf den App-Kacheln",
       "entityHint": "Diese App auf eine bestimmte GSL-Entität beschränken",
       "allEntities": "Alle Entitäten",
-      "slugHint": "Eindeutiger Bezeichner (Kleinbuchstaben und Bindestriche)"
+      "slugHint": "Eindeutiger Bezeichner (Kleinbuchstaben und Bindestriche)",
+      "internal": "Intern",
+      "external": "Extern",
+      "archive": "Archivieren",
+      "archiveApp": "Anwendung archivieren",
+      "reactivate": "Reaktivieren",
+      "reactivateApp": "Anwendung reaktivieren",
+      "deleteApp": "Anwendung löschen",
+      "deleteConfirm": "{name} löschen? Dadurch werden auch alle Zugangseinträge entfernt. Dies kann nicht rückgängig gemacht werden.",
+      "deleting": "Wird gelöscht...",
+      "failedCreate": "Anwendung konnte nicht erstellt werden",
+      "failedUpdate": "Anwendung konnte nicht aktualisiert werden",
+      "failedDelete": "Anwendung konnte nicht gelöscht werden",
+      "dangerZone": "Gefahrenzone",
+      "count": "{count} Apps",
+      "descPlaceholder": "Kurze Beschreibung der Anwendung"
     },
     "auditLog": {
       "title": "Audit-Protokoll",
@@ -123,7 +211,16 @@
       "resource": "Ressource",
       "ipAddress": "IP-Adresse",
       "system": "System",
-      "noEvents": "Noch keine Audit-Protokolleinträge."
+      "noEvents": "Noch keine Audit-Protokolleinträge.",
+      "signIn": "Anmeldung",
+      "signOut": "Abmeldung",
+      "request": "Anfrage",
+      "grant": "Gewähren",
+      "revoke": "Widerrufen",
+      "create": "Erstellen",
+      "update": "Aktualisieren",
+      "delete": "Löschen",
+      "count": "{count} Ereignisse"
     },
     "settings": {
       "title": "Einstellungen",
@@ -143,10 +240,17 @@
     "revision": "Révision",
     "both": "Beide",
     "gslFiduciaire": "GSL Fiduciaire",
-    "gslRevision": "GSL Révision"
+    "gslRevision": "GSL Révision",
+    "gslBoth": "GSL Fiduciaire & GSL Révision"
   },
-  "mfa": {
-    "banner": "Sichern Sie Ihr Konto mit Zwei-Faktor-Authentifizierung.",
-    "setup": "2FA einrichten"
+  "roles": {
+    "admin": "Admin",
+    "manager": "Manager",
+    "member": "Mitglied",
+    "viewer": "Betrachter"
+  },
+  "security": {
+    "title": "Sicherheit",
+    "subtitle": "Verwalten Sie die Sicherheitseinstellungen Ihres Kontos."
   }
 }

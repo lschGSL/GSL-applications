@@ -3,6 +3,7 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LayoutGrid, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/context";
 
 export function AppCard({
   name,
@@ -16,6 +17,7 @@ export function AppCard({
   iconUrl?: string | null;
 }) {
   const fullUrl = url && url.trim() ? (url.startsWith("http") ? url : `https://${url}`) : "";
+  const { t } = useI18n();
 
   const handleClick = async () => {
     if (!fullUrl) return;
@@ -55,7 +57,7 @@ export function AppCard({
             </CardTitle>
             <CardDescription className="text-xs">{description}</CardDescription>
             {!fullUrl && (
-              <p className="text-xs text-muted-foreground mt-1">URL not configured</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("apps.urlNotConfigured")}</p>
             )}
           </div>
         </div>

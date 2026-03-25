@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { signUp } from "@/lib/auth/actions";
 import { PasswordStrength } from "@/components/security/password-strength";
 import { validatePassword } from "@/lib/password";
+import { useI18n } from "@/lib/i18n/context";
 
 interface InviteData {
   email: string;
@@ -40,6 +41,7 @@ function RegisterForm() {
   const [inviteError, setInviteError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const inviteToken = searchParams.get("invite");
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!inviteToken) return;
@@ -48,14 +50,14 @@ function RegisterForm() {
       .then(async (res) => {
         if (!res.ok) {
           const data = await res.json();
-          setInviteError(data.error || "Invalid invitation");
+          setInviteError(data.error || t("auth.invalidInvitation"));
           return;
         }
         const data = await res.json();
         setInvite(data);
       })
-      .catch(() => setInviteError("Failed to validate invitation"));
-  }, [inviteToken]);
+      .catch(() => setInviteError(t("auth.failedValidateInvite")));
+  }, [inviteToken, t]);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -65,7 +67,7 @@ function RegisterForm() {
     const confirm = formData.get("confirm_password") as string;
 
     if (pw !== confirm) {
-      setError("Passwords do not match");
+      setError(t("auth.passwordsDoNotMatch"));
       setLoading(false);
       return;
     }
@@ -77,7 +79,6 @@ function RegisterForm() {
       return;
     }
 
-    // If invited, use the invitation email and pass token
     if (invite && inviteToken) {
       formData.set("email", invite.email);
       formData.set("invite_token", inviteToken);
@@ -90,19 +91,16 @@ function RegisterForm() {
     }
   }
 
-  const entityLabel = invite?.entity === "gsl_fiduciaire" ? "GSL Fiduciaire" : invite?.entity === "gsl_revision" ? "GSL Révision" : invite?.entity === "both" ? "Both entities" : null;
+  const entityLabel = invite?.entity === "gsl_fiduciaire" ? t("entity.gslFiduciaire") : invite?.entity === "gsl_revision" ? t("entity.gslRevision") : invite?.entity === "both" ? t("entity.both") : null;
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
-          {invite ? "Accept Invitation" : "Create an account"}
+          {invite ? t("auth.acceptInvitation") : t("auth.createAccount")}
         </CardTitle>
         <CardDescription>
-          {invite
-            ? `You've been invited to join the GSL Portal`
-            : "Join the GSL Portal to access company applications"
-          }
+          {invite ? t("auth.invitedToJoin") : t("auth.joinPortal")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -131,13 +129,13 @@ function RegisterForm() {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="full_name" className="text-sm font-medium">
-              Full name
+              {t("auth.fullName")}
             </label>
             <Input
               id="full_name"
               name="full_name"
               type="text"
-              placeholder="John Doe"
+              placeholder={t("auth.namePlaceholder")}
               required
               autoComplete="name"
             />
@@ -145,13 +143,13 @@ function RegisterForm() {
           {!invite && (
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
-                Email
+                {t("auth.email")}
               </label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@company.com"
+                placeholder={t("auth.emailPlaceholder")}
                 required
                 autoComplete="email"
               />
@@ -159,13 +157,13 @@ function RegisterForm() {
           )}
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t("auth.password")}
             </label>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="Min. 12 characters"
+              placeholder={t("auth.minChars")}
               required
               autoComplete="new-password"
               minLength={12}
@@ -176,13 +174,13 @@ function RegisterForm() {
           </div>
           <div className="space-y-2">
             <label htmlFor="confirm_password" className="text-sm font-medium">
-              Confirm password
+              {t("auth.confirmPassword")}
             </label>
             <Input
               id="confirm_password"
               name="confirm_password"
               type="password"
-              placeholder="Repeat your password"
+              placeholder={t("auth.repeatPassword")}
               required
               autoComplete="new-password"
               minLength={12}
@@ -190,15 +188,15 @@ function RegisterForm() {
           </div>
           <Button type="submit" className="w-full" disabled={loading || !!inviteError}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {invite ? "Accept & Create account" : "Create account"}
+            {invite ? t("auth.acceptAndCreate") : t("auth.signUp")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Already have an account?{" "}
+          {t("auth.hasAccount")}{" "}
           <Link href="/login" className="text-primary hover:underline font-medium">
-            Sign in
+            {t("auth.signIn")}
           </Link>
         </p>
       </CardFooter>

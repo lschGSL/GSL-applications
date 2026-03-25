@@ -18,7 +18,14 @@
     "page": "Page",
     "of": "sur",
     "noResults": "Aucun résultat trouvé.",
-    "comingSoon": "Bientôt disponible"
+    "comingSoon": "Bientôt disponible",
+    "current": "Actuel",
+    "you": "Vous",
+    "noName": "Sans nom",
+    "networkError": "Erreur réseau",
+    "viaVercel": "Via Vercel",
+    "getStarted": "Commencer",
+    "dismiss": "Fermer"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -26,16 +33,45 @@
     "signUp": "Créer un compte",
     "email": "Email",
     "password": "Mot de passe",
+    "newPassword": "Nouveau mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
     "fullName": "Nom complet",
     "forgotPassword": "Mot de passe oublié ?",
     "resetPassword": "Réinitialiser le mot de passe",
+    "sendResetLink": "Envoyer le lien",
+    "backToLogin": "Retour à la connexion",
     "noAccount": "Pas encore de compte ?",
     "hasAccount": "Déjà un compte ?",
     "checkEmail": "Vérifiez votre email pour confirmer votre compte",
     "acceptInvitation": "Accepter l'invitation",
     "acceptAndCreate": "Accepter et créer le compte",
-    "invitedToJoin": "Vous avez été invité(e) à rejoindre le portail GSL"
+    "createAccount": "Créer un compte",
+    "invitedToJoin": "Vous avez été invité(e) à rejoindre le portail GSL",
+    "joinPortal": "Rejoignez le portail GSL pour accéder aux applications de l'entreprise",
+    "invalidInvitation": "Invitation invalide",
+    "failedValidateInvite": "Échec de la validation de l'invitation",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "minChars": "Min. 12 caractères",
+    "repeatPassword": "Répétez votre mot de passe",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "setNewPassword": "Définir un nouveau mot de passe",
+    "enterNewPassword": "Entrez votre nouveau mot de passe ci-dessous",
+    "enterEmail": "Entrez votre email et nous vous enverrons un lien de réinitialisation",
+    "welcomeBack": "Bienvenue",
+    "signInToAccount": "Connectez-vous à votre compte GSL Portal",
+    "enterPassword": "Entrez votre mot de passe",
+    "emailPlaceholder": "vous@entreprise.com",
+    "namePlaceholder": "Jean Dupont",
+    "passwordUpdated": "Mot de passe mis à jour avec succès"
+  },
+  "mfa": {
+    "title": "Authentification à deux facteurs",
+    "subtitle": "Entrez le code à 6 chiffres de votre application d'authentification",
+    "enter6Digits": "Veuillez entrer un code à 6 chiffres",
+    "verify": "Vérifier",
+    "banner": "Sécurisez votre compte avec l'authentification à deux facteurs",
+    "bannerDesc": "Protégez votre compte en activant la 2FA. Cela ne prend qu'une minute et ajoute une couche de sécurité supplémentaire.",
+    "setup": "Activer la 2FA"
   },
   "nav": {
     "main": "Principal",
@@ -47,6 +83,23 @@
     "appManagement": "Gestion des applications",
     "auditLog": "Journal d'audit",
     "settings": "Paramètres"
+  },
+  "landing": {
+    "heroTitle1": "Vos applications,",
+    "heroTitle2": "un seul portail.",
+    "heroDesc": "Le portail GSL centralise l'accès à toutes les applications de l'entreprise avec une sécurité de niveau entreprise, un contrôle d'accès basé sur les rôles et un journal d'audit complet.",
+    "featureSecurity": "Sécurité entreprise",
+    "featureSecurityDesc": "Authentification multi-facteurs, sécurité au niveau des lignes, connexions chiffrées et en-têtes de sécurité par défaut.",
+    "featureUsers": "Gestion des utilisateurs",
+    "featureUsersDesc": "Contrôle d'accès basé sur les rôles avec permissions par application. Journal d'audit complet de toutes les actions.",
+    "featureApps": "Hub d'applications",
+    "featureAppsDesc": "Tableau de bord centralisé pour accéder à toutes les applications internes et externes. Une connexion, tous vos outils.",
+    "tagline": "fiduciaire | révision | management",
+    "footerAbout": "À propos de nous",
+    "footerNews": "Actualités",
+    "footerContact": "Contact",
+    "footerPortal": "Portail",
+    "footerCopyright": "Tous droits réservés © {year} GSL Luxembourg"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -63,13 +116,19 @@
   "apps": {
     "title": "Applications",
     "subtitle": "Parcourez et accédez aux applications de l'entreprise.",
-    "noApps": "Aucune application configurée pour le moment.",
+    "noApps": "Aucune application trouvée.",
+    "noAppsConfigured": "Aucune application configurée pour le moment.",
     "accessGranted": "Accès accordé",
     "noAccess": "Pas d'accès",
+    "granted": "Accordé",
     "requestAccess": "Demander l'accès",
     "requestSent": "Demande envoyée",
+    "requestFailed": "Échec de l'envoi de la demande",
     "openApplication": "Ouvrir l'application",
-    "urlNotConfigured": "URL non configurée"
+    "urlNotConfigured": "URL non configurée",
+    "noDescription": "Aucune description disponible.",
+    "searchPlaceholder": "Rechercher par nom ou description...",
+    "count": "{count} apps"
   },
   "admin": {
     "users": {
@@ -81,13 +140,24 @@
       "role": "Rôle",
       "entity": "Entité",
       "joined": "Inscrit le",
+      "lastUpdated": "Dernière mise à jour",
       "changeRole": "Changer le rôle",
       "deactivate": "Désactiver",
       "activate": "Activer",
+      "deactivateAccount": "Désactiver le compte",
+      "activateAccount": "Activer le compte",
+      "accountStatus": "Statut du compte",
       "inviteUser": "Inviter un utilisateur",
       "inviteTitle": "Inviter un utilisateur",
       "inviteSent": "Invitation envoyée avec succès !",
-      "sendInvitation": "Envoyer l'invitation"
+      "sendInvitation": "Envoyer l'invitation",
+      "noUsers": "Aucun utilisateur trouvé.",
+      "userDetails": "Détails de l'utilisateur",
+      "cannotChangeOwnRole": "Vous ne pouvez pas modifier votre propre rôle.",
+      "cannotDeactivateOwn": "Vous ne pouvez pas désactiver votre propre compte.",
+      "noEntity": "Aucune entité",
+      "noEntityAssigned": "Aucune entité assignée",
+      "count": "{count} utilisateurs"
     },
     "apps": {
       "title": "Gestion des applications",
@@ -95,22 +165,40 @@
       "addApp": "Ajouter une application",
       "registerApp": "Enregistrer l'application",
       "editApp": "Modifier l'application",
+      "appDetails": "Détails de l'application",
       "saveChanges": "Enregistrer",
       "searchPlaceholder": "Rechercher par nom, slug ou URL...",
       "application": "Application",
       "slug": "Slug",
       "visibility": "Visibilité",
       "created": "Créé le",
+      "lastUpdated": "Dernière mise à jour",
       "noApps": "Aucune application enregistrée pour le moment.",
       "addFirst": "Cliquez sur « Ajouter une application » pour enregistrer votre première app.",
       "name": "Nom",
       "url": "URL",
       "description": "Description",
       "iconUrl": "URL de l'icône",
+      "icon": "Icône",
       "iconHint": "Icône optionnelle affichée sur les tuiles d'application",
       "entityHint": "Restreindre cette application à une entité GSL spécifique",
       "allEntities": "Toutes les entités",
-      "slugHint": "Identifiant unique (minuscules et tirets uniquement)"
+      "slugHint": "Identifiant unique (minuscules et tirets uniquement)",
+      "internal": "Interne",
+      "external": "Externe",
+      "archive": "Archiver",
+      "archiveApp": "Archiver l'application",
+      "reactivate": "Réactiver",
+      "reactivateApp": "Réactiver l'application",
+      "deleteApp": "Supprimer l'application",
+      "deleteConfirm": "Supprimer {name} ? Cela supprimera également tous les enregistrements d'accès. Cette action est irréversible.",
+      "deleting": "Suppression...",
+      "failedCreate": "Échec de la création de l'application",
+      "failedUpdate": "Échec de la mise à jour de l'application",
+      "failedDelete": "Échec de la suppression de l'application",
+      "dangerZone": "Zone de danger",
+      "count": "{count} apps",
+      "descPlaceholder": "Brève description de l'application"
     },
     "auditLog": {
       "title": "Journal d'audit",
@@ -123,7 +211,16 @@
       "resource": "Ressource",
       "ipAddress": "Adresse IP",
       "system": "Système",
-      "noEvents": "Aucune entrée dans le journal d'audit."
+      "noEvents": "Aucune entrée dans le journal d'audit.",
+      "signIn": "Connexion",
+      "signOut": "Déconnexion",
+      "request": "Demande",
+      "grant": "Accorder",
+      "revoke": "Révoquer",
+      "create": "Créer",
+      "update": "Modifier",
+      "delete": "Supprimer",
+      "count": "{count} événements"
     },
     "settings": {
       "title": "Paramètres",
@@ -143,10 +240,17 @@
     "revision": "Révision",
     "both": "Les deux",
     "gslFiduciaire": "GSL Fiduciaire",
-    "gslRevision": "GSL Révision"
+    "gslRevision": "GSL Révision",
+    "gslBoth": "GSL Fiduciaire & GSL Révision"
   },
-  "mfa": {
-    "banner": "Sécurisez votre compte avec l'authentification à deux facteurs.",
-    "setup": "Configurer la 2FA"
+  "roles": {
+    "admin": "Admin",
+    "manager": "Manager",
+    "member": "Membre",
+    "viewer": "Lecteur"
+  },
+  "security": {
+    "title": "Sécurité",
+    "subtitle": "Gérez les paramètres de sécurité de votre compte."
   }
 }

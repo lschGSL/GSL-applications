@@ -9,12 +9,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { createBrowserClient } from "@supabase/ssr";
 import { PasswordStrength } from "@/components/security/password-strength";
 import { validatePassword } from "@/lib/password";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const { t } = useI18n();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -31,7 +33,7 @@ export default function ResetPasswordPage() {
     }
 
     if (pw !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("auth.passwordsDoNotMatch"));
       setLoading(false);
       return;
     }
@@ -49,16 +51,14 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    router.push("/login?message=Password updated successfully");
+    router.push(`/login?message=${encodeURIComponent(t("auth.passwordUpdated"))}`);
   }
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Set new password</CardTitle>
-        <CardDescription>
-          Enter your new password below
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("auth.setNewPassword")}</CardTitle>
+        <CardDescription>{t("auth.enterNewPassword")}</CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
@@ -69,13 +69,13 @@ export default function ResetPasswordPage() {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              New password
+              {t("auth.newPassword")}
             </label>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="Min. 12 characters"
+              placeholder={t("auth.minChars")}
               required
               minLength={12}
               autoComplete="new-password"
@@ -86,13 +86,13 @@ export default function ResetPasswordPage() {
           </div>
           <div className="space-y-2">
             <label htmlFor="confirm_password" className="text-sm font-medium">
-              Confirm password
+              {t("auth.confirmPassword")}
             </label>
             <Input
               id="confirm_password"
               name="confirm_password"
               type="password"
-              placeholder="Repeat your password"
+              placeholder={t("auth.repeatPassword")}
               required
               minLength={12}
               autoComplete="new-password"
@@ -100,7 +100,7 @@ export default function ResetPasswordPage() {
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Update password
+            {t("auth.updatePassword")}
           </Button>
         </form>
       </CardContent>

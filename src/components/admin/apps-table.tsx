@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { LayoutGrid } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { AppDetailPanel } from "@/components/admin/app-detail-panel";
+import { useI18n } from "@/lib/i18n/context";
 import type { Application } from "@/types/database";
 
 export function AppsTable({ apps }: { apps: Application[] }) {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+  const { t } = useI18n();
 
   return (
     <>
@@ -19,22 +21,22 @@ export function AppsTable({ apps }: { apps: Application[] }) {
             <thead>
               <tr className="border-b bg-muted/50">
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Application
+                  {t("admin.apps.application")}
                 </th>
                 <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Slug
+                  {t("admin.apps.slug")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Visibility
+                  {t("admin.apps.visibility")}
                 </th>
                 <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Entity
+                  {t("admin.users.entity")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Status
+                  {t("common.status")}
                 </th>
                 <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Created
+                  {t("admin.apps.created")}
                 </th>
               </tr>
             </thead>
@@ -70,15 +72,15 @@ export function AppsTable({ apps }: { apps: Application[] }) {
                   <td className="hidden lg:table-cell px-4 py-4">
                     {app.entity ? (
                       <Badge variant="outline" className="text-xs">
-                        {app.entity === "gsl_fiduciaire" ? "Fiduciaire" : app.entity === "gsl_revision" ? "Révision" : "Both"}
+                        {app.entity === "gsl_fiduciaire" ? t("entity.fiduciaire") : app.entity === "gsl_revision" ? t("entity.revision") : t("entity.both")}
                       </Badge>
                     ) : (
-                      <span className="text-xs text-muted-foreground">All</span>
+                      <span className="text-xs text-muted-foreground">{t("common.all")}</span>
                     )}
                   </td>
                   <td className="px-4 py-4">
                     <Badge variant={app.is_active ? "success" : "destructive"}>
-                      {app.is_active ? "Active" : "Inactive"}
+                      {app.is_active ? t("common.active") : t("common.inactive")}
                     </Badge>
                   </td>
                   <td className="hidden lg:table-cell px-4 py-4 text-sm text-muted-foreground whitespace-nowrap">
@@ -90,10 +92,8 @@ export function AppsTable({ apps }: { apps: Application[] }) {
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center">
                     <LayoutGrid className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                    <p className="text-muted-foreground">No applications registered yet.</p>
-                    <p className="text-sm text-muted-foreground/70 mt-1">
-                      Click &quot;Add Application&quot; to register your first app.
-                    </p>
+                    <p className="text-muted-foreground">{t("admin.apps.noApps")}</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">{t("admin.apps.addFirst")}</p>
                   </td>
                 </tr>
               )}
