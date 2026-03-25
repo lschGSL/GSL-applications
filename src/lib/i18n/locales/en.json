@@ -149,6 +149,8 @@
       "deactivateAccount": "Deactivate Account",
       "activateAccount": "Activate Account",
       "accountStatus": "Account Status",
+      "addUser": "Add User",
+      "userCreated": "User created successfully!",
       "inviteUser": "Invite User",
       "inviteTitle": "Invite User",
       "inviteSent": "Invitation sent successfully!",
