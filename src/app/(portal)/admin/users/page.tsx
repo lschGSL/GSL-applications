@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/admin/search-input";
 import { FilterBar } from "@/components/admin/filter-bar";
 import { InviteUserDialog } from "@/components/admin/invite-user-dialog";
+import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { UsersTable } from "@/components/admin/users-table";
 
 const userFilters = [
@@ -41,7 +42,7 @@ const userFilters = [
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; invite?: string; role?: string; entity?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; invite?: string; add?: string; role?: string; entity?: string; status?: string }>;
 }) {
   const profile = await getProfile();
 
@@ -102,6 +103,7 @@ export default async function UsersPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <AddUserDialog showDialog={params.add === "true"} />
           <InviteUserDialog showDialog={params.invite === "true"} />
           <Badge variant="secondary">{users?.length ?? 0} users</Badge>
         </div>
