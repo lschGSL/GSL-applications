@@ -18,7 +18,14 @@
     "page": "Page",
     "of": "of",
     "noResults": "No results found.",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "current": "Current",
+    "you": "You",
+    "noName": "No name",
+    "networkError": "Network error",
+    "viaVercel": "Via Vercel",
+    "getStarted": "Get started",
+    "dismiss": "Dismiss"
   },
   "auth": {
     "signIn": "Sign in",
@@ -26,16 +33,45 @@
     "signUp": "Create account",
     "email": "Email",
     "password": "Password",
+    "newPassword": "New password",
     "confirmPassword": "Confirm password",
     "fullName": "Full name",
-    "forgotPassword": "Forgot your password?",
-    "resetPassword": "Reset Password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "checkEmail": "Check your email to confirm your account",
     "acceptInvitation": "Accept Invitation",
     "acceptAndCreate": "Accept & Create account",
-    "invitedToJoin": "You've been invited to join the GSL Portal"
+    "createAccount": "Create an account",
+    "invitedToJoin": "You've been invited to join the GSL Portal",
+    "joinPortal": "Join the GSL Portal to access company applications",
+    "invalidInvitation": "Invalid invitation",
+    "failedValidateInvite": "Failed to validate invitation",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "minChars": "Min. 12 characters",
+    "repeatPassword": "Repeat your password",
+    "updatePassword": "Update password",
+    "setNewPassword": "Set new password",
+    "enterNewPassword": "Enter your new password below",
+    "enterEmail": "Enter your email and we'll send you a reset link",
+    "welcomeBack": "Welcome back",
+    "signInToAccount": "Sign in to your GSL Portal account",
+    "enterPassword": "Enter your password",
+    "emailPlaceholder": "you@company.com",
+    "namePlaceholder": "John Doe",
+    "passwordUpdated": "Password updated successfully"
+  },
+  "mfa": {
+    "title": "Two-factor authentication",
+    "subtitle": "Enter the 6-digit code from your authenticator app",
+    "enter6Digits": "Please enter a 6-digit code",
+    "verify": "Verify",
+    "banner": "Secure your account with Two-Factor Authentication",
+    "bannerDesc": "Protect your account by enabling 2FA. It only takes a minute and adds an extra layer of security.",
+    "setup": "Enable 2FA now"
   },
   "nav": {
     "main": "Main",
@@ -47,6 +83,23 @@
     "appManagement": "App Management",
     "auditLog": "Audit Log",
     "settings": "Settings"
+  },
+  "landing": {
+    "heroTitle1": "Your applications,",
+    "heroTitle2": "one portal.",
+    "heroDesc": "GSL Portal provides centralized access to all company applications with enterprise-grade security, role-based access control, and comprehensive audit logging.",
+    "featureSecurity": "Enterprise Security",
+    "featureSecurityDesc": "Multi-factor authentication, row-level security, encrypted connections, and security headers by default.",
+    "featureUsers": "User Management",
+    "featureUsersDesc": "Role-based access control with per-application permissions. Full audit trail of all user actions.",
+    "featureApps": "App Hub",
+    "featureAppsDesc": "Centralized dashboard to access all internal and external applications. One login, all your tools.",
+    "tagline": "fiduciaire | révision | management",
+    "footerAbout": "About us",
+    "footerNews": "News",
+    "footerContact": "Contact",
+    "footerPortal": "Portal",
+    "footerCopyright": "All rights reserved © {year} GSL Luxembourg"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -63,13 +116,19 @@
   "apps": {
     "title": "Applications",
     "subtitle": "Browse and access company applications.",
-    "noApps": "No applications configured yet.",
+    "noApps": "No applications found.",
+    "noAppsConfigured": "No applications configured yet.",
     "accessGranted": "Access granted",
     "noAccess": "No access",
+    "granted": "Granted",
     "requestAccess": "Request Access",
     "requestSent": "Request Sent",
+    "requestFailed": "Failed to submit request",
     "openApplication": "Open Application",
-    "urlNotConfigured": "URL not configured"
+    "urlNotConfigured": "URL not configured",
+    "noDescription": "No description available.",
+    "searchPlaceholder": "Search apps by name or description...",
+    "count": "{count} apps"
   },
   "admin": {
     "users": {
@@ -81,13 +140,24 @@
       "role": "Role",
       "entity": "Entity",
       "joined": "Joined",
+      "lastUpdated": "Last updated",
       "changeRole": "Change role",
       "deactivate": "Deactivate",
       "activate": "Activate",
+      "deactivateAccount": "Deactivate Account",
+      "activateAccount": "Activate Account",
+      "accountStatus": "Account Status",
       "inviteUser": "Invite User",
       "inviteTitle": "Invite User",
       "inviteSent": "Invitation sent successfully!",
-      "sendInvitation": "Send Invitation"
+      "sendInvitation": "Send Invitation",
+      "noUsers": "No users found.",
+      "userDetails": "User Details",
+      "cannotChangeOwnRole": "You cannot change your own role.",
+      "cannotDeactivateOwn": "You cannot deactivate your own account.",
+      "noEntity": "No entity",
+      "noEntityAssigned": "No entity assigned",
+      "count": "{count} users"
     },
     "apps": {
       "title": "App Management",
@@ -95,22 +165,40 @@
       "addApp": "Add Application",
       "registerApp": "Register Application",
       "editApp": "Edit Application",
+      "appDetails": "Application Details",
       "saveChanges": "Save Changes",
       "searchPlaceholder": "Search apps by name, slug, or URL...",
       "application": "Application",
       "slug": "Slug",
       "visibility": "Visibility",
       "created": "Created",
+      "lastUpdated": "Last updated",
       "noApps": "No applications registered yet.",
       "addFirst": "Click \"Add Application\" to register your first app.",
       "name": "Name",
       "url": "URL",
       "description": "Description",
       "iconUrl": "Icon URL",
+      "icon": "Icon",
       "iconHint": "Optional icon displayed on app tiles",
       "entityHint": "Restrict this app to a specific GSL entity",
       "allEntities": "All entities",
-      "slugHint": "Unique identifier (lowercase, hyphens only)"
+      "slugHint": "Unique identifier (lowercase, hyphens only)",
+      "internal": "Internal",
+      "external": "External",
+      "archive": "Archive",
+      "archiveApp": "Archive Application",
+      "reactivate": "Reactivate",
+      "reactivateApp": "Reactivate Application",
+      "deleteApp": "Delete Application",
+      "deleteConfirm": "Delete {name}? This will also remove all access records. This cannot be undone.",
+      "deleting": "Deleting...",
+      "failedCreate": "Failed to create application",
+      "failedUpdate": "Failed to update application",
+      "failedDelete": "Failed to delete application",
+      "dangerZone": "Danger Zone",
+      "count": "{count} apps",
+      "descPlaceholder": "Brief description of the application"
     },
     "auditLog": {
       "title": "Audit Log",
@@ -123,7 +211,16 @@
       "resource": "Resource",
       "ipAddress": "IP Address",
       "system": "System",
-      "noEvents": "No audit log entries yet."
+      "noEvents": "No audit log entries found.",
+      "signIn": "Sign in",
+      "signOut": "Sign out",
+      "request": "Request",
+      "grant": "Grant",
+      "revoke": "Revoke",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "count": "{count} events"
     },
     "settings": {
       "title": "Settings",
@@ -143,10 +240,17 @@
     "revision": "Révision",
     "both": "Both",
     "gslFiduciaire": "GSL Fiduciaire",
-    "gslRevision": "GSL Révision"
+    "gslRevision": "GSL Révision",
+    "gslBoth": "GSL Fiduciaire & GSL Révision"
   },
-  "mfa": {
-    "banner": "Secure your account with two-factor authentication.",
-    "setup": "Set up 2FA"
+  "roles": {
+    "admin": "Admin",
+    "manager": "Manager",
+    "member": "Member",
+    "viewer": "Viewer"
+  },
+  "security": {
+    "title": "Security",
+    "subtitle": "Manage your account security settings."
   }
 }

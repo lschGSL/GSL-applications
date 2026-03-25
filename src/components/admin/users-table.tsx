@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials, formatDate } from "@/lib/utils";
 import { UserDetailPanel } from "@/components/admin/user-detail-panel";
+import { useI18n } from "@/lib/i18n/context";
 import type { Profile } from "@/types/database";
 
 const roleColors: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -23,6 +24,7 @@ export function UsersTable({
   currentUserId: string;
 }) {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const { t } = useI18n();
 
   return (
     <>
@@ -33,19 +35,19 @@ export function UsersTable({
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    User
+                    {t("admin.users.user")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Role
+                    {t("admin.users.role")}
                   </th>
                   <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Entity
+                    {t("admin.users.entity")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Status
+                    {t("common.status")}
                   </th>
                   <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Joined
+                    {t("admin.users.joined")}
                   </th>
                 </tr>
               </thead>
@@ -66,7 +68,7 @@ export function UsersTable({
                         </Avatar>
                         <div>
                           <p className="font-medium text-sm">
-                            {user.full_name || "No name"}
+                            {user.full_name || t("common.noName")}
                           </p>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
@@ -74,13 +76,13 @@ export function UsersTable({
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant={roleColors[user.role] ?? "secondary"} className="capitalize">
-                        {user.role}
+                        {t(`roles.${user.role}`)}
                       </Badge>
                     </td>
                     <td className="hidden md:table-cell px-6 py-4">
                       {user.entity ? (
                         <Badge variant="outline" className="text-xs">
-                          {user.entity === "gsl_fiduciaire" ? "Fiduciaire" : user.entity === "gsl_revision" ? "Révision" : "Both"}
+                          {user.entity === "gsl_fiduciaire" ? t("entity.fiduciaire") : user.entity === "gsl_revision" ? t("entity.revision") : t("entity.both")}
                         </Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
@@ -88,7 +90,7 @@ export function UsersTable({
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant={user.is_active ? "success" : "destructive"}>
-                        {user.is_active ? "Active" : "Inactive"}
+                        {user.is_active ? t("common.active") : t("common.inactive")}
                       </Badge>
                     </td>
                     <td className="hidden lg:table-cell px-6 py-4 text-sm text-muted-foreground">
@@ -99,7 +101,7 @@ export function UsersTable({
                 {users.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                      No users found.
+                      {t("admin.users.noUsers")}
                     </td>
                   </tr>
                 )}

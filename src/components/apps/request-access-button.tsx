@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Lock, Loader2, CheckCircle } from "lucide-react";
+import { useI18n } from "@/lib/i18n/context";
 
 export function RequestAccessButton({ appId, appName }: { appId: string; appName: string }) {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const router = useRouter();
+  const { t } = useI18n();
 
   async function handleRequest() {
     setLoading(true);
@@ -21,7 +23,7 @@ export function RequestAccessButton({ appId, appName }: { appId: string; appName
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Failed to submit request");
+        alert(data.error || t("apps.requestFailed"));
         return;
       }
 
@@ -35,7 +37,7 @@ export function RequestAccessButton({ appId, appName }: { appId: string; appName
   if (sent) {
     return (
       <Button variant="outline" className="w-full" disabled>
-        <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Request Sent
+        <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> {t("apps.requestSent")}
       </Button>
     );
   }
@@ -47,7 +49,7 @@ export function RequestAccessButton({ appId, appName }: { appId: string; appName
       ) : (
         <Lock className="mr-2 h-4 w-4" />
       )}
-      Request Access
+      {t("apps.requestAccess")}
     </Button>
   );
 }

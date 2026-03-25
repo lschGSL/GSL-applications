@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { verifyMFACode } from "@/lib/auth/mfa-actions";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function MFAVerifyPage() {
   return (
@@ -30,12 +31,12 @@ function MFAVerifyForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const { t } = useI18n();
 
   function handleInput(index: number, value: string) {
     if (!/^\d*$/.test(value)) return;
 
     const newCode = [...code];
-    // Handle paste of full code
     if (value.length > 1) {
       const digits = value.slice(0, 6).split("");
       digits.forEach((d, i) => {
@@ -65,7 +66,7 @@ function MFAVerifyForm() {
     e.preventDefault();
     const fullCode = code.join("");
     if (fullCode.length !== 6) {
-      setError("Please enter a 6-digit code");
+      setError(t("mfa.enter6Digits"));
       return;
     }
 
@@ -90,10 +91,8 @@ function MFAVerifyForm() {
         <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <ShieldCheck className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="text-2xl">Two-factor authentication</CardTitle>
-        <CardDescription>
-          Enter the 6-digit code from your authenticator app
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("mfa.title")}</CardTitle>
+        <CardDescription>{t("mfa.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
@@ -123,7 +122,7 @@ function MFAVerifyForm() {
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Verify
+            {t("mfa.verify")}
           </Button>
         </form>
       </CardContent>

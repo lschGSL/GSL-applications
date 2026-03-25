@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { forgotPassword } from "@/lib/auth/actions";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -26,10 +28,8 @@ export default function ForgotPasswordPage() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Reset password</CardTitle>
-        <CardDescription>
-          Enter your email and we&apos;ll send you a reset link
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("auth.resetPassword")}</CardTitle>
+        <CardDescription>{t("auth.enterEmail")}</CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
@@ -45,20 +45,20 @@ export default function ForgotPasswordPage() {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t("auth.email")}
             </label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="you@company.com"
+              placeholder={t("auth.emailPlaceholder")}
               required
               autoComplete="email"
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Send reset link
+            {t("auth.sendResetLink")}
           </Button>
         </form>
         <div className="mt-4 text-center">
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="mr-1 h-4 w-4" />
-            Back to login
+            {t("auth.backToLogin")}
           </Link>
         </div>
       </CardContent>

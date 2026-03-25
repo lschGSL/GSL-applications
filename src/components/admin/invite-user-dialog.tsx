@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserPlus, X, Loader2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n/context";
 
 export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const { t } = useI18n();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -32,7 +34,7 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to send invitation");
+        setError(data.error || t("common.networkError"));
         setLoading(false);
         return;
       }
@@ -43,7 +45,7 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
         router.refresh();
       }, 1500);
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,7 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
     <>
       <Button type="button" asChild>
         <Link href="/admin/users?invite=true">
-          <UserPlus className="mr-2 h-4 w-4" /> Invite User
+          <UserPlus className="mr-2 h-4 w-4" /> {t("admin.users.inviteUser")}
         </Link>
       </Button>
 
@@ -61,7 +63,7 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <Card className="w-full max-w-lg mx-4">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Invite User</CardTitle>
+              <CardTitle>{t("admin.users.inviteTitle")}</CardTitle>
               <Button type="button" variant="ghost" size="icon" asChild>
                 <Link href="/admin/users">
                   <X className="h-4 w-4" />
@@ -76,55 +78,45 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
               )}
               {success && (
                 <div className="mb-4 rounded-lg bg-green-500/10 p-3 text-sm text-green-600">
-                  Invitation sent successfully!
+                  {t("admin.users.inviteSent")}
                 </div>
               )}
               <form action={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="invite-email" className="text-sm font-medium">Email *</label>
-                  <Input
-                    id="invite-email"
-                    name="email"
-                    type="email"
-                    placeholder="jean@gsl.lu"
-                    required
-                  />
+                  <label htmlFor="invite-email" className="text-sm font-medium">{t("auth.email")} *</label>
+                  <Input id="invite-email" name="email" type="email" placeholder="jean@gsl.lu" required />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="invite-role" className="text-sm font-medium">Role</label>
+                  <label htmlFor="invite-role" className="text-sm font-medium">{t("admin.users.role")}</label>
                   <select
-                    id="invite-role"
-                    name="role"
-                    defaultValue="member"
+                    id="invite-role" name="role" defaultValue="member"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="member">Member</option>
-                    <option value="viewer">Viewer</option>
+                    <option value="admin">{t("roles.admin")}</option>
+                    <option value="manager">{t("roles.manager")}</option>
+                    <option value="member">{t("roles.member")}</option>
+                    <option value="viewer">{t("roles.viewer")}</option>
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="invite-entity" className="text-sm font-medium">Entity</label>
+                  <label htmlFor="invite-entity" className="text-sm font-medium">{t("admin.users.entity")}</label>
                   <select
-                    id="invite-entity"
-                    name="entity"
-                    defaultValue=""
+                    id="invite-entity" name="entity" defaultValue=""
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <option value="">No entity</option>
-                    <option value="gsl_fiduciaire">GSL Fiduciaire</option>
-                    <option value="gsl_revision">GSL Révision</option>
-                    <option value="both">Both</option>
+                    <option value="">{t("admin.users.noEntity")}</option>
+                    <option value="gsl_fiduciaire">{t("entity.gslFiduciaire")}</option>
+                    <option value="gsl_revision">{t("entity.gslRevision")}</option>
+                    <option value="both">{t("entity.both")}</option>
                   </select>
                 </div>
                 <div className="flex gap-3 pt-2">
                   <Button type="button" variant="outline" className="flex-1" asChild>
-                    <Link href="/admin/users">Cancel</Link>
+                    <Link href="/admin/users">{t("common.cancel")}</Link>
                   </Button>
                   <Button type="submit" className="flex-1" disabled={loading || success}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Send Invitation
+                    {t("admin.users.sendInvitation")}
                   </Button>
                 </div>
               </form>

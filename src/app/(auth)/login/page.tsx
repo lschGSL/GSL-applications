@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { signIn } from "@/lib/auth/actions";
+import { useI18n } from "@/lib/i18n/context";
 
 export default function LoginPage() {
   return (
@@ -23,6 +24,7 @@ function LoginForm() {
   const redirect = searchParams.get("redirect");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -33,7 +35,6 @@ function LoginForm() {
       setError(result.error);
       setLoading(false);
     } else if (result?.redirectTo) {
-      // External redirect to an allowed domain
       window.location.href = result.redirectTo;
     }
   }
@@ -41,8 +42,8 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to your GSL Portal account</CardDescription>
+        <CardTitle className="text-2xl">{t("auth.welcomeBack")}</CardTitle>
+        <CardDescription>{t("auth.signInToAccount")}</CardDescription>
       </CardHeader>
       <CardContent>
         {message && (
@@ -58,13 +59,13 @@ function LoginForm() {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t("auth.email")}
             </label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="you@company.com"
+              placeholder={t("auth.emailPlaceholder")}
               required
               autoComplete="email"
             />
@@ -72,35 +73,35 @@ function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="text-sm font-medium">
-                Password
+                {t("auth.password")}
               </label>
               <Link
                 href="/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
-                Forgot password?
+                {t("auth.forgotPassword")}
               </Link>
             </div>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder={t("auth.enterPassword")}
               required
               autoComplete="current-password"
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign in
+            {t("auth.signIn")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          {t("auth.noAccount")}{" "}
           <Link href="/register" className="text-primary hover:underline font-medium">
-            Sign up
+            {t("auth.signUp")}
           </Link>
         </p>
       </CardFooter>

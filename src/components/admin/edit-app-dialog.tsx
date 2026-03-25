@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Loader2 } from "lucide-react";
+import { useI18n } from "@/lib/i18n/context";
 import type { Application } from "@/types/database";
 
 export function EditAppDialog({
@@ -18,6 +19,7 @@ export function EditAppDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { t } = useI18n();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -40,7 +42,7 @@ export function EditAppDialog({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to update application");
+        setError(data.error || t("admin.apps.failedUpdate"));
         setLoading(false);
         return;
       }
@@ -48,7 +50,7 @@ export function EditAppDialog({
       router.refresh();
       onClose();
     } catch {
-      setError("Network error");
+      setError(t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -58,141 +60,61 @@ export function EditAppDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <Card className="w-full max-w-lg mx-4">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Edit Application</CardTitle>
+          <CardTitle>{t("admin.apps.editApp")}</CardTitle>
           <Button type="button" variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
-            </div>
+            <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
           )}
           <form action={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="edit-app-name" className="text-sm font-medium">
-                Name *
-              </label>
-              <Input
-                id="edit-app-name"
-                name="name"
-                defaultValue={app.name}
-                required
-              />
+              <label htmlFor="edit-app-name" className="text-sm font-medium">{t("admin.apps.name")} *</label>
+              <Input id="edit-app-name" name="name" defaultValue={app.name} required />
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-app-slug" className="text-sm font-medium">
-                Slug *
-              </label>
-              <Input
-                id="edit-app-slug"
-                name="slug"
-                defaultValue={app.slug}
-                required
-                pattern="[a-z0-9-]+"
-              />
-              <p className="text-xs text-muted-foreground">
-                Unique identifier (lowercase, hyphens only)
-              </p>
+              <label htmlFor="edit-app-slug" className="text-sm font-medium">{t("admin.apps.slug")} *</label>
+              <Input id="edit-app-slug" name="slug" defaultValue={app.slug} required pattern="[a-z0-9-]+" />
+              <p className="text-xs text-muted-foreground">{t("admin.apps.slugHint")}</p>
             </div>
             <div className="space-y-2">
-              <label htmlFor="edit-app-url" className="text-sm font-medium">
-                URL *
-              </label>
-              <Input
-                id="edit-app-url"
-                name="url"
-                type="url"
-                defaultValue={app.url}
-                required
-              />
+              <label htmlFor="edit-app-url" className="text-sm font-medium">{t("admin.apps.url")} *</label>
+              <Input id="edit-app-url" name="url" type="url" defaultValue={app.url} required />
             </div>
             <div className="space-y-2">
-              <label
-                htmlFor="edit-app-description"
-                className="text-sm font-medium"
-              >
-                Description
-              </label>
-              <Input
-                id="edit-app-description"
-                name="description"
-                defaultValue={app.description || ""}
-              />
+              <label htmlFor="edit-app-description" className="text-sm font-medium">{t("admin.apps.description")}</label>
+              <Input id="edit-app-description" name="description" defaultValue={app.description || ""} />
             </div>
             <div className="space-y-2">
-              <label
-                htmlFor="edit-app-icon-url"
-                className="text-sm font-medium"
-              >
-                Icon URL
-              </label>
-              <Input
-                id="edit-app-icon-url"
-                name="icon_url"
-                type="url"
-                defaultValue={app.icon_url || ""}
-                placeholder="https://example.com/icon.png"
-              />
-              <p className="text-xs text-muted-foreground">
-                Optional icon displayed on app tiles
-              </p>
+              <label htmlFor="edit-app-icon-url" className="text-sm font-medium">{t("admin.apps.iconUrl")}</label>
+              <Input id="edit-app-icon-url" name="icon_url" type="url" defaultValue={app.icon_url || ""} placeholder="https://example.com/icon.png" />
+              <p className="text-xs text-muted-foreground">{t("admin.apps.iconHint")}</p>
             </div>
             <div className="space-y-2">
-              <label
-                htmlFor="edit-app-visibility"
-                className="text-sm font-medium"
-              >
-                Visibility
-              </label>
-              <select
-                id="edit-app-visibility"
-                name="visibility"
-                defaultValue={app.visibility}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="internal">Internal</option>
-                <option value="external">External</option>
-                <option value="both">Both</option>
+              <label htmlFor="edit-app-visibility" className="text-sm font-medium">{t("admin.apps.visibility")}</label>
+              <select id="edit-app-visibility" name="visibility" defaultValue={app.visibility} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <option value="internal">{t("admin.apps.internal")}</option>
+                <option value="external">{t("admin.apps.external")}</option>
+                <option value="both">{t("entity.both")}</option>
               </select>
             </div>
             <div className="space-y-2">
-              <label
-                htmlFor="edit-app-entity"
-                className="text-sm font-medium"
-              >
-                Entity
-              </label>
-              <select
-                id="edit-app-entity"
-                name="entity"
-                defaultValue={app.entity || ""}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="">All entities</option>
-                <option value="gsl_fiduciaire">GSL Fiduciaire</option>
-                <option value="gsl_revision">GSL Révision</option>
-                <option value="both">Both</option>
+              <label htmlFor="edit-app-entity" className="text-sm font-medium">{t("admin.users.entity")}</label>
+              <select id="edit-app-entity" name="entity" defaultValue={app.entity || ""} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <option value="">{t("admin.apps.allEntities")}</option>
+                <option value="gsl_fiduciaire">{t("entity.gslFiduciaire")}</option>
+                <option value="gsl_revision">{t("entity.gslRevision")}</option>
+                <option value="both">{t("entity.both")}</option>
               </select>
-              <p className="text-xs text-muted-foreground">
-                Restrict this app to a specific GSL entity
-              </p>
+              <p className="text-xs text-muted-foreground">{t("admin.apps.entityHint")}</p>
             </div>
             <div className="flex gap-3 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={onClose}
-              >
-                Cancel
-              </Button>
+              <Button type="button" variant="outline" className="flex-1" onClick={onClose}>{t("common.cancel")}</Button>
               <Button type="submit" className="flex-1" disabled={loading}>
-                {loading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Save Changes
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t("admin.apps.saveChanges")}
               </Button>
             </div>
           </form>
