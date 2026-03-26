@@ -121,7 +121,16 @@ export default async function AuditLogPage({
             Complete history of all system events and user actions.
           </p>
         </div>
-        <Badge variant="secondary">{totalItems} events</Badge>
+        <div className="flex items-center gap-3">
+          <a
+            href="/api/admin/audit-log/export"
+            className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent transition-colors"
+            download
+          >
+            Export CSV
+          </a>
+          <Badge variant="secondary">{totalItems} events</Badge>
+        </div>
       </div>
 
       <div className="space-y-3">
