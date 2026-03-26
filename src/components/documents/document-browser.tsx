@@ -7,12 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Folder, FileText, Download, Upload, Trash2, CheckCircle, XCircle,
-  Loader2, ChevronRight, ArrowLeft, FileSpreadsheet, Image, PenLine, ShieldCheck,
+  Loader2, ChevronRight, ArrowLeft, FileSpreadsheet, Image, PenLine, ShieldCheck, Send,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { DocumentStatusBadge } from "./document-status-badge";
 import { UploadDialog } from "./upload-dialog";
 import { SignDialog } from "./sign-dialog";
+import { SendForSignatureDialog } from "./send-for-signature-dialog";
 import { useI18n } from "@/lib/i18n/context";
 import type { Document, DocumentFolder, DocumentStatus, FolderType } from "@/types/database";
 
@@ -51,6 +52,7 @@ export function DocumentBrowser({
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [showUpload, setShowUpload] = useState(false);
   const [signingDoc, setSigningDoc] = useState<{ id: string; name: string } | null>(null);
+  const [sendForSigDoc, setSendForSigDoc] = useState<{ id: string; name: string; clientId: string } | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const router = useRouter();
   const { t } = useI18n();
@@ -269,9 +271,9 @@ export function DocumentBrowser({
                         )}
                         {isAdmin && actionLoading !== doc.id && (
                           <>
-                            {!doc.signature_required && !doc.signed_at && doc.status === "approved" && (
-                              <Button variant="ghost" size="sm" className="text-amber-600" title={t("signatures.requestSignature")} onClick={() => requestSignature(doc.id)}>
-                                <PenLine className="h-4 w-4" />
+                            {!doc.signed_at && doc.status === "approved" && (
+                              <Button variant="ghost" size="sm" className="text-amber-600" title={t("signatures.sendForSignature")} onClick={() => setSendForSigDoc({ id: doc.id, name: doc.name, clientId: doc.client_id })}>
+                                <Send className="h-4 w-4" />
                               </Button>
                             )}
                             {doc.status !== "approved" && (
@@ -320,6 +322,15 @@ export function DocumentBrowser({
           documentId={signingDoc.id}
           documentName={signingDoc.name}
           onClose={() => setSigningDoc(null)}
+        />
+      )}
+
+      {sendForSigDoc && (
+        <SendForSignatureDialog
+          documentId={sendForSigDoc.id}
+          documentName={sendForSigDoc.name}
+          clientId={sendForSigDoc.clientId}
+          onClose={() => setSendForSigDoc(null)}
         />
       )}
     </div>

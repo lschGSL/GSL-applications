@@ -117,6 +117,14 @@ export async function POST(
     .update({ signed_at: signedAt })
     .eq("id", id);
 
+  // Update signature request if exists
+  await supabase
+    .from("signature_requests")
+    .update({ status: "signed", signed_at: signedAt, signature_id: signature.id })
+    .eq("document_id", id)
+    .eq("signer_id", user.id)
+    .eq("status", "pending");
+
   // Audit log
   await supabase.from("audit_logs").insert({
     user_id: user.id,
