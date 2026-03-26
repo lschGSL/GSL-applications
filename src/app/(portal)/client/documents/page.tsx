@@ -14,7 +14,7 @@ export default async function ClientDocumentsPage() {
 
   const supabase = await createClient();
 
-  const [foldersResult, docsResult, requestsResult] = await Promise.all([
+  const [foldersResult, docsResult, requestsResult, sigRequestsResult] = await Promise.all([
     supabase
       .from("document_folders")
       .select("*")
@@ -30,10 +30,22 @@ export default async function ClientDocumentsPage() {
       .select("*")
       .eq("client_id", profile.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("signature_requests")
+      .select("*, documents:document_id(name)")
+      .eq("signer_id", profile.id)
+      .eq("status", "pending"),
   ]);
 
   const pendingRequests = requestsResult.data?.filter((r) => r.status === "pending") ?? [];
-  const docsToSign = docsResult.data?.filter((d) => d.signature_required && !d.signed_at) ?? [];
+  const pendingSigRequests = sigRequestsResult.data ?? [];
+  const docsToSign = [
+    ...docsResult.data?.filter((d) => d.signature_required && !d.signed_at) ?? [],
+    ...pendingSigRequests.map((sr: { document_id: string; documents: { name: string } | { name: string }[] | null }) => {
+      const doc = Array.isArray(sr.documents) ? sr.documents[0] : sr.documents;
+      return { id: sr.document_id, name: doc?.name || "Document" };
+    }),
+  ].filter((d, i, arr) => arr.findIndex((x) => x.id === d.id) === i);
 
   return (
     <div className="space-y-8">

@@ -310,7 +310,11 @@
     "signatureRequired": "Signature requise",
     "requestSignature": "Demander la signature",
     "docsToSign": "Documents a signer",
-    "docsToSignHint": "Retrouvez ces documents ci-dessous pour les signer."
+    "docsToSignHint": "Retrouvez ces documents ci-dessous pour les signer.",
+    "sendForSignature": "Envoyer pour signature",
+    "requestsSent": "Demandes de signature envoyees !",
+    "searchSigners": "Rechercher des utilisateurs...",
+    "signersSelected": "signataire(s) selectionne(s)"
   },
   "security": {
     "title": "Sécurité",

@@ -146,3 +146,21 @@ export interface DocumentSignature {
   signer_name?: string;
   signer_email?: string;
 }
+
+export type SignatureRequestStatus = "pending" | "signed" | "declined";
+
+export interface SignatureRequest {
+  id: string;
+  document_id: string;
+  signer_id: string;
+  requested_by: string;
+  status: SignatureRequestStatus;
+  signed_at: string | null;
+  signature_id: string | null;
+  created_at: string;
+  // Joined
+  signer_name?: string;
+  signer_email?: string;
+  document_name?: string;
+  requester_name?: string;
+}
