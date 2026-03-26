@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { sendAccessRequestNotification } from "@/lib/email/resend";
+import { webhookAccessRequest } from "@/lib/webhooks";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -59,6 +60,11 @@ export async function POST(request: NextRequest) {
       userEmail: profile.email,
       appName: app.name,
     }).catch(() => {}); // Fire and forget
+  }
+
+  // Webhook
+  if (app && profile) {
+    webhookAccessRequest(profile.full_name || profile.email, app.name).catch(() => {});
   }
 
   return NextResponse.json({ success: true, message: "Access request submitted" }, { status: 201 });

@@ -299,6 +299,15 @@
     "viewer": "Lecteur",
     "client": "Client"
   },
+  "signatures": {
+    "signDocument": "Signer le document",
+    "sign": "Signer",
+    "signed": "Signe",
+    "confirmText": "Vous allez signer electroniquement le document suivant. Entrez votre mot de passe pour confirmer votre identite.",
+    "enterPassword": "Confirmez votre mot de passe",
+    "passwordHint": "Votre mot de passe est utilise pour verifier votre identite pour cette signature.",
+    "alreadySigned": "Deja signe"
+  },
   "security": {
     "title": "Sécurité",
     "subtitle": "Gérez les paramètres de sécurité de votre compte."

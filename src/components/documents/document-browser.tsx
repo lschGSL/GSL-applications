@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Folder, FileText, Download, Upload, Trash2, CheckCircle, XCircle,
-  Loader2, ChevronRight, ArrowLeft, FileSpreadsheet, Image,
+  Loader2, ChevronRight, ArrowLeft, FileSpreadsheet, Image, PenLine, ShieldCheck,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { DocumentStatusBadge } from "./document-status-badge";
 import { UploadDialog } from "./upload-dialog";
+import { SignDialog } from "./sign-dialog";
 import { useI18n } from "@/lib/i18n/context";
 import type { Document, DocumentFolder, DocumentStatus, FolderType } from "@/types/database";
 
@@ -49,6 +50,7 @@ export function DocumentBrowser({
 }) {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [showUpload, setShowUpload] = useState(false);
+  const [signingDoc, setSigningDoc] = useState<{ id: string; name: string } | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const router = useRouter();
   const { t } = useI18n();
@@ -212,7 +214,15 @@ export function DocumentBrowser({
                       </div>
                     </td>
                     <td className="hidden sm:table-cell px-4 py-3">
-                      <DocumentStatusBadge status={doc.status as DocumentStatus} />
+                      <div className="flex items-center gap-1.5">
+                        <DocumentStatusBadge status={doc.status as DocumentStatus} />
+                        {doc.signed_at && (
+                          <Badge variant="outline" className="text-xs gap-1">
+                            <ShieldCheck className="h-3 w-3 text-green-600" />
+                            {t("signatures.signed")}
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="hidden md:table-cell px-4 py-3 text-sm text-muted-foreground whitespace-nowrap">
                       {formatDate(doc.created_at)}
@@ -226,6 +236,16 @@ export function DocumentBrowser({
                         >
                           <Download className="h-4 w-4" />
                         </Button>
+                        {!doc.signed_at && doc.status === "approved" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-primary"
+                            onClick={() => setSigningDoc({ id: doc.id, name: doc.name })}
+                          >
+                            <PenLine className="h-4 w-4" />
+                          </Button>
+                        )}
                         {isAdmin && actionLoading !== doc.id && (
                           <>
                             {doc.status !== "approved" && (
@@ -266,6 +286,14 @@ export function DocumentBrowser({
           clientId={clientId}
           folderId={currentFolderId}
           onClose={() => setShowUpload(false)}
+        />
+      )}
+
+      {signingDoc && (
+        <SignDialog
+          documentId={signingDoc.id}
+          documentName={signingDoc.name}
+          onClose={() => setSigningDoc(null)}
         />
       )}
     </div>

@@ -299,6 +299,15 @@
     "viewer": "Viewer",
     "client": "Client"
   },
+  "signatures": {
+    "signDocument": "Sign Document",
+    "sign": "Sign",
+    "signed": "Signed",
+    "confirmText": "You are about to electronically sign the following document. Enter your password to confirm your identity.",
+    "enterPassword": "Confirm your password",
+    "passwordHint": "Your password is used to verify your identity for this signature.",
+    "alreadySigned": "Already signed"
+  },
   "security": {
     "title": "Security",
     "subtitle": "Manage your account security settings."

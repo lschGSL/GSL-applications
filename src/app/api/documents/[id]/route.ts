@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { sendDocumentStatusNotification } from "@/lib/email/resend";
+import { webhookDocumentStatusChanged } from "@/lib/webhooks";
 
 // Update document (status, notes)
 export async function PATCH(
@@ -55,7 +56,7 @@ export async function PATCH(
     user_agent: headersList.get("user-agent"),
   });
 
-  // Notify client when document is approved or rejected
+  // Notify client + webhook when document is approved or rejected
   if (status === "approved" || status === "rejected") {
     const { data: client } = await supabase
       .from("profiles")
@@ -75,6 +76,8 @@ export async function PATCH(
         notes,
         portalUrl: `${proto}://${host}`,
       });
+
+      webhookDocumentStatusChanged(client.full_name || client.email, data.name, status).catch(() => {});
     }
   }
 

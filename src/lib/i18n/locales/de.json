@@ -299,6 +299,15 @@
     "viewer": "Betrachter",
     "client": "Kunde"
   },
+  "signatures": {
+    "signDocument": "Dokument unterschreiben",
+    "sign": "Unterschreiben",
+    "signed": "Unterschrieben",
+    "confirmText": "Sie sind dabei, das folgende Dokument elektronisch zu unterschreiben. Geben Sie Ihr Passwort ein, um Ihre Identitat zu bestatigen.",
+    "enterPassword": "Passwort bestatigen",
+    "passwordHint": "Ihr Passwort wird zur Verifizierung Ihrer Identitat fur diese Unterschrift verwendet.",
+    "alreadySigned": "Bereits unterschrieben"
+  },
   "security": {
     "title": "Sicherheit",
     "subtitle": "Verwalten Sie die Sicherheitseinstellungen Ihres Kontos."

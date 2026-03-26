@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
+import { webhookDocumentUploaded } from "@/lib/webhooks";
 
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
@@ -122,6 +123,14 @@ export async function POST(request: NextRequest) {
     ip_address: headersList.get("x-forwarded-for") || "unknown",
     user_agent: headersList.get("user-agent"),
   });
+
+  // Webhook
+  const { data: uploader } = await supabase
+    .from("profiles")
+    .select("full_name, email")
+    .eq("id", user.id)
+    .single();
+  webhookDocumentUploaded(uploader?.full_name || uploader?.email || "Unknown", docName).catch(() => {});
 
   return NextResponse.json(doc, { status: 201 });
 }

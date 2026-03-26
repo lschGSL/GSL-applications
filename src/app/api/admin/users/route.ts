@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
+import { webhookNewUser } from "@/lib/webhooks";
 
 // Create a new user directly (admin/manager only)
 export async function POST(request: NextRequest) {
@@ -76,6 +77,9 @@ export async function POST(request: NextRequest) {
     ip_address: headersList.get("x-forwarded-for") || "unknown",
     user_agent: headersList.get("user-agent"),
   });
+
+  // Webhook
+  webhookNewUser(full_name || "", email, role || "member").catch(() => {});
 
   return NextResponse.json({ id: authData.user?.id, email }, { status: 201 });
 }

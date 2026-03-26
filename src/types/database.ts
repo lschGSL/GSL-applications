@@ -98,6 +98,8 @@ export interface Document {
   folder_id: string | null;
   status: DocumentStatus;
   notes: string | null;
+  signature_required: boolean;
+  signed_at: string | null;
   created_at: string;
   updated_at: string;
   // Joined fields
@@ -125,4 +127,22 @@ export interface DocumentRequest {
   client_email?: string;
   requester_name?: string;
   requester_email?: string;
+}
+
+export type SignatureMethod = "simple" | "luxtrust" | "docusign";
+
+export interface DocumentSignature {
+  id: string;
+  document_id: string;
+  signed_by: string;
+  signed_at: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  signature_hash: string;
+  method: SignatureMethod;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  // Joined
+  signer_name?: string;
+  signer_email?: string;
 }
