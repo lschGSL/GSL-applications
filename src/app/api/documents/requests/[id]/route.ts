@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
+import { sendDocumentStatusNotification } from "@/lib/email/resend";
 
 // Update a document request
 export async function PATCH(
@@ -90,6 +91,28 @@ export async function PATCH(
     ip_address: headersList.get("x-forwarded-for") || "unknown",
     user_agent: headersList.get("user-agent"),
   });
+
+  // Notify client when request is approved or rejected
+  if (updates.status === "approved" || updates.status === "rejected") {
+    const { data: client } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", data.client_id)
+      .single();
+
+    if (client) {
+      const host = headersList.get("host") || "localhost:3000";
+      const proto = headersList.get("x-forwarded-proto") || "http";
+
+      await sendDocumentStatusNotification({
+        clientEmail: client.email,
+        clientName: client.full_name || client.email,
+        documentName: data.title,
+        status: updates.status as "approved" | "rejected",
+        portalUrl: `${proto}://${host}`,
+      });
+    }
+  }
 
   return NextResponse.json(data);
 }

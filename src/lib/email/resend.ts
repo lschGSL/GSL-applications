@@ -104,6 +104,46 @@ export async function sendAccessRevokedNotification({
   });
 }
 
+export async function sendDocumentStatusNotification({
+  clientEmail,
+  clientName,
+  documentName,
+  status,
+  notes,
+  portalUrl,
+}: {
+  clientEmail: string;
+  clientName: string;
+  documentName: string;
+  status: "approved" | "rejected";
+  notes?: string | null;
+  portalUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  const isApproved = status === "approved";
+  const statusLabel = isApproved ? "approuvé" : "rejeté";
+  const statusColor = isApproved ? "#16a34a" : "#dc2626";
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [clientEmail],
+    subject: `[${APP_NAME}] Document ${statusLabel} : ${documentName}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1a1a1a;">Document ${statusLabel}</h2>
+        <p>Bonjour <strong>${clientName}</strong>,</p>
+        <p>Votre document <strong>${documentName}</strong> a été <span style="color: ${statusColor}; font-weight: bold;">${statusLabel}</span>.</p>
+        ${notes ? `<div style="background: #f5f5f5; padding: 12px; border-radius: 8px; margin: 16px 0;"><p style="margin: 0; color: #666;"><strong>Note :</strong> ${notes}</p></div>` : ""}
+        <p><a href="${portalUrl}/client/documents" style="display: inline-block; padding: 10px 20px; background: #0070f3; color: white; text-decoration: none; border-radius: 6px;">Voir mes documents</a></p>
+        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
+        <p style="color: #666; font-size: 12px;">${APP_NAME}</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendDocumentRequestNotification({
   clientEmail,
   clientName,
