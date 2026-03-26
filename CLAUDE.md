@@ -144,6 +144,7 @@ Optional:
 | `004_invitations.sql` | Invitations table with token, role, entity, expiry |
 | `005_default_app_icons.sql` | Set default letter-based icons (ui-avatars.com) |
 | `006_client_documents.sql` | Client role, document_folders, documents tables, RLS |
+| `007_document_requests.sql` | Document requests table (workflow GSL → client) |
 
 ## Roadmap
 
@@ -166,6 +167,7 @@ Contexte metier : fiduciaire/revision au Luxembourg (GSL Fiduciaire + GSL Revisi
 |---------|--------|
 | Notifications email (Resend) | ✅ Done |
 | Invitations utilisateur (admin invite avec role/entite) | ✅ Done |
+| Creation directe d'utilisateurs (admin, avec role client) | ✅ Done |
 | Recherche et filtres (apps, users, audit log) | ✅ Done |
 | Multi-entite GSL (Fiduciaire / Revision) | ✅ Done |
 | Icones des applications (auto-generees + icon_url) | ✅ Done |
@@ -173,7 +175,7 @@ Contexte metier : fiduciaire/revision au Luxembourg (GSL Fiduciaire + GSL Revisi
 | Panneau detail apps (slide-over, edit, archive, delete) | ✅ Done |
 | FilterBar reutilisable (chips, URL params) | ✅ Done |
 
-### Phase 3 — Portail client / documents (en cours)
+### Phase 3 — Portail client / documents ✅ DONE (Q4 2026)
 
 | Feature | Statut |
 |---------|--------|
@@ -183,23 +185,24 @@ Contexte metier : fiduciaire/revision au Luxembourg (GSL Fiduciaire + GSL Revisi
 | Gestion admin des clients (page + panneau detail) | ✅ Done |
 | DocumentBrowser (navigation dossiers, breadcrumbs, tableau fichiers) | ✅ Done |
 | Approve/reject documents (admin workflow) | ✅ Done |
-| Demandes de documents (workflow email GSL → client) | ❌ Pas encore |
+| Demandes de documents (workflow email GSL → client) | ✅ Done |
+| Notifications client (email quand doc approuve/rejete) | ✅ Done |
 | Signatures electroniques (LuxTrust/DocuSign) | ❌ Pas encore |
-| Notifications client (email + in-app) | ❌ Pas encore |
 | Audit trail client (qui a consulte quoi) | ❌ Pas encore |
 
-### Phase 4 — Ops & monitoring
+### Phase 4 — Ops & monitoring ✅ DONE (Q1 2027)
 
 | Feature | Statut |
 |---------|--------|
-| Health check endpoint `/api/health` | ❌ Pas encore |
-| Export audit log CSV/Excel | ❌ Pas encore |
-| Analytics dashboard | ❌ Pas encore |
+| Health check endpoint `/api/health` | ✅ Done |
+| Export audit log CSV/Excel | ✅ Done |
+| Analytics dashboard (stats, activite, top apps, logins recents) | ✅ Done |
 | Webhooks Slack/Teams | ❌ Pas encore |
 
 ### Planning previsionnel
 
 - **Q2 2026** → Phase 1 (Securite) ✅
 - **Q3 2026** → Phase 2 (UX collaborateur) ✅
-- **Q4 2026** → Phase 3 (Espace client + Documents) — en cours
-- **Q1 2027** → Phase 3 suite (Workflows + Signatures) + Phase 4
+- **Q4 2026** → Phase 3 (Espace client + Documents) ✅
+- **Q1 2027** → Phase 4 (Ops & monitoring) ✅
+- **A venir** → Signatures electroniques, audit trail client, webhooks
