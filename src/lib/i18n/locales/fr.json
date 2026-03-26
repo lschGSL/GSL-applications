@@ -306,7 +306,11 @@
     "confirmText": "Vous allez signer electroniquement le document suivant. Entrez votre mot de passe pour confirmer votre identite.",
     "enterPassword": "Confirmez votre mot de passe",
     "passwordHint": "Votre mot de passe est utilise pour verifier votre identite pour cette signature.",
-    "alreadySigned": "Deja signe"
+    "alreadySigned": "Deja signe",
+    "signatureRequired": "Signature requise",
+    "requestSignature": "Demander la signature",
+    "docsToSign": "Documents a signer",
+    "docsToSignHint": "Retrouvez ces documents ci-dessous pour les signer."
   },
   "security": {
     "title": "Sécurité",

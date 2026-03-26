@@ -33,6 +33,7 @@ export default async function ClientDocumentsPage() {
   ]);
 
   const pendingRequests = requestsResult.data?.filter((r) => r.status === "pending") ?? [];
+  const docsToSign = docsResult.data?.filter((d) => d.signature_required && !d.signed_at) ?? [];
 
   return (
     <div className="space-y-8">
@@ -42,6 +43,27 @@ export default async function ClientDocumentsPage() {
           Browse and upload your documents.
         </p>
       </div>
+
+      {/* Documents to sign */}
+      {docsToSign.length > 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/50 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-sm font-semibold text-amber-800 dark:text-amber-400">Documents a signer</h2>
+            <Badge variant="warning">{docsToSign.length}</Badge>
+          </div>
+          <div className="space-y-2">
+            {docsToSign.map((doc) => (
+              <div key={doc.id} className="flex items-center justify-between rounded-md bg-background p-3 border">
+                <span className="text-sm font-medium">{doc.name}</span>
+                <Badge variant="warning" className="text-xs">Signature requise</Badge>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-amber-700 dark:text-amber-500/80 mt-3">
+            Retrouvez ces documents ci-dessous pour les signer.
+          </p>
+        </div>
+      )}
 
       {/* Pending requests section */}
       {(requestsResult.data?.length ?? 0) > 0 && (
