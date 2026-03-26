@@ -90,6 +90,20 @@ export function DocumentBrowser({
     }
   }
 
+  async function requestSignature(docId: string) {
+    setActionLoading(docId);
+    try {
+      await fetch(`/api/documents/${docId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signature_required: true }),
+      });
+      router.refresh();
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
   async function deleteDoc(docId: string) {
     setActionLoading(docId);
     try {
@@ -222,6 +236,12 @@ export function DocumentBrowser({
                             {t("signatures.signed")}
                           </Badge>
                         )}
+                        {doc.signature_required && !doc.signed_at && (
+                          <Badge variant="warning" className="text-xs gap-1">
+                            <PenLine className="h-3 w-3" />
+                            {t("signatures.signatureRequired")}
+                          </Badge>
+                        )}
                       </div>
                     </td>
                     <td className="hidden md:table-cell px-4 py-3 text-sm text-muted-foreground whitespace-nowrap">
@@ -236,18 +256,24 @@ export function DocumentBrowser({
                         >
                           <Download className="h-4 w-4" />
                         </Button>
-                        {!doc.signed_at && doc.status === "approved" && (
+                        {!doc.signed_at && (doc.signature_required || doc.status === "approved") && (
                           <Button
                             variant="ghost"
                             size="sm"
                             className="text-primary"
                             onClick={() => setSigningDoc({ id: doc.id, name: doc.name })}
+                            title={t("signatures.sign")}
                           >
                             <PenLine className="h-4 w-4" />
                           </Button>
                         )}
                         {isAdmin && actionLoading !== doc.id && (
                           <>
+                            {!doc.signature_required && !doc.signed_at && doc.status === "approved" && (
+                              <Button variant="ghost" size="sm" className="text-amber-600" title={t("signatures.requestSignature")} onClick={() => requestSignature(doc.id)}>
+                                <PenLine className="h-4 w-4" />
+                              </Button>
+                            )}
                             {doc.status !== "approved" && (
                               <Button variant="ghost" size="sm" className="text-green-600" onClick={() => updateDocStatus(doc.id, "approved")}>
                                 <CheckCircle className="h-4 w-4" />

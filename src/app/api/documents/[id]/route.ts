@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
-import { sendDocumentStatusNotification } from "@/lib/email/resend";
+import { sendDocumentStatusNotification, sendSignatureRequestNotification } from "@/lib/email/resend";
 import { webhookDocumentStatusChanged } from "@/lib/webhooks";
 
 // Update document (status, notes)
@@ -28,11 +28,12 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const { status, notes } = body;
+  const { status, notes, signature_required } = body;
 
   const updates: Record<string, unknown> = {};
   if (status) updates.status = status;
   if (notes !== undefined) updates.notes = notes;
+  if (typeof signature_required === "boolean") updates.signature_required = signature_required;
 
   const { data, error } = await supabase
     .from("documents")
@@ -48,7 +49,7 @@ export async function PATCH(
   const headersList = await headers();
   await supabase.from("audit_logs").insert({
     user_id: user.id,
-    action: status === "approved" ? "approve_document" : status === "rejected" ? "reject_document" : "update_document",
+    action: signature_required ? "request_signature" : status === "approved" ? "approve_document" : status === "rejected" ? "reject_document" : "update_document",
     resource_type: "document",
     resource_id: id,
     details: updates,
@@ -78,6 +79,34 @@ export async function PATCH(
       });
 
       webhookDocumentStatusChanged(client.full_name || client.email, data.name, status).catch(() => {});
+    }
+  }
+
+  // Notify client when signature is requested
+  if (signature_required === true) {
+    const { data: client } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", data.client_id)
+      .single();
+
+    const { data: requester } = await supabase
+      .from("profiles")
+      .select("full_name, email")
+      .eq("id", user.id)
+      .single();
+
+    if (client) {
+      const host = headersList.get("host") || "localhost:3000";
+      const proto = headersList.get("x-forwarded-proto") || "http";
+
+      await sendSignatureRequestNotification({
+        clientEmail: client.email,
+        clientName: client.full_name || client.email,
+        documentName: data.name,
+        requesterName: requester?.full_name || requester?.email || "GSL",
+        portalUrl: `${proto}://${host}`,
+      });
     }
   }
 

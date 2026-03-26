@@ -188,6 +188,42 @@ export async function sendDocumentRequestNotification({
   });
 }
 
+export async function sendSignatureRequestNotification({
+  clientEmail,
+  clientName,
+  documentName,
+  requesterName,
+  portalUrl,
+}: {
+  clientEmail: string;
+  clientName: string;
+  documentName: string;
+  requesterName: string;
+  portalUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [clientEmail],
+    subject: `[${APP_NAME}] Signature requise : ${documentName}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1a1a1a;">Signature requise</h2>
+        <p>Bonjour <strong>${clientName}</strong>,</p>
+        <p><strong>${requesterName}</strong> vous demande de signer le document suivant :</p>
+        <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 16px 0;">
+          <p style="margin: 0; font-weight: bold;">${documentName}</p>
+        </div>
+        <p><a href="${portalUrl}/client/documents" style="display: inline-block; padding: 10px 20px; background: #0070f3; color: white; text-decoration: none; border-radius: 6px;">Signer le document</a></p>
+        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
+        <p style="color: #666; font-size: 12px;">${APP_NAME}</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendInvitationEmail({
   email,
   invitedBy,

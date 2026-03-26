@@ -306,7 +306,11 @@
     "confirmText": "Sie sind dabei, das folgende Dokument elektronisch zu unterschreiben. Geben Sie Ihr Passwort ein, um Ihre Identitat zu bestatigen.",
     "enterPassword": "Passwort bestatigen",
     "passwordHint": "Ihr Passwort wird zur Verifizierung Ihrer Identitat fur diese Unterschrift verwendet.",
-    "alreadySigned": "Bereits unterschrieben"
+    "alreadySigned": "Bereits unterschrieben",
+    "signatureRequired": "Unterschrift erforderlich",
+    "requestSignature": "Unterschrift anfordern",
+    "docsToSign": "Zu unterschreibende Dokumente",
+    "docsToSignHint": "Finden Sie diese Dokumente unten, um sie zu unterschreiben."
   },
   "security": {
     "title": "Sicherheit",
