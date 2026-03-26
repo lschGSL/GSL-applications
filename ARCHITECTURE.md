@@ -395,6 +395,9 @@ Via **Resend** (fire-and-forget, silencieux si cle API absente) :
 | Acces accorde | L'utilisateur | `[GSL Portal] Access granted: {app}` |
 | Acces revoque | L'utilisateur | `[GSL Portal] Access revoked: {app}` |
 | Invitation | L'invite | `[GSL Portal] You've been invited` |
+| Demande de document | Le client | `[GSL Portal] Document demande : {titre}` |
+| Document approuve | Le client | `[GSL Portal] Document approuve : {nom}` |
+| Document rejete | Le client | `[GSL Portal] Document rejete : {nom}` |
 
 ---
 
@@ -422,7 +425,20 @@ Admin cree un dossier pour le client
   -> Client ou admin upload un document
   -> Document en statut "pending"
   -> Admin review : approve ou reject
+  -> Client recoit email de notification
   -> Client peut telecharger ses documents
+```
+
+### Flux demande de document
+
+```
+Admin cree une demande pour le client
+  -> Titre, description, dossier cible, date limite
+  -> Client recoit email avec lien vers son espace
+  -> Client voit la demande en "pending" avec bouton upload
+  -> Client upload le document -> statut "uploaded"
+  -> Admin review : approve ou reject
+  -> Client recoit email de notification
 ```
 
 ### API Documents
@@ -432,12 +448,16 @@ Admin cree un dossier pour le client
 | POST | `/api/documents/upload` | Upload fichier (FormData) |
 | GET | `/api/documents` | Liste documents (filtrable par client_id) |
 | GET | `/api/documents/[id]/download` | Redirect vers URL signee (60s) |
-| PATCH | `/api/documents/[id]` | Update status/notes (admin) |
+| PATCH | `/api/documents/[id]` | Update status/notes (admin) + email client |
 | DELETE | `/api/documents/[id]` | Supprimer doc + fichier storage |
 | GET | `/api/documents/folders` | Liste dossiers |
 | POST | `/api/documents/folders` | Creer dossier (admin) |
 | PATCH | `/api/documents/folders/[id]` | Update dossier |
 | DELETE | `/api/documents/folders/[id]` | Supprimer dossier |
+| GET | `/api/documents/requests` | Liste demandes (filtrable par client_id) |
+| POST | `/api/documents/requests` | Creer demande (admin) + email client |
+| PATCH | `/api/documents/requests/[id]` | Update statut/lier document |
+| DELETE | `/api/documents/requests/[id]` | Supprimer demande |
 
 ### Types de dossiers
 
@@ -546,16 +566,47 @@ Pour integrer une app (ex: "Agent Fiscal") dans le portail :
 | `004_invitations.sql` | Table invitations avec token, role, entite, expiry |
 | `005_default_app_icons.sql` | Icones par defaut (ui-avatars.com) pour apps sans icon_url |
 | `006_client_documents.sql` | Role client, tables document_folders et documents, RLS |
+| `007_document_requests.sql` | Demandes de documents (workflow GSL -> client) |
 
 **Note** : La trigger function s'appelle `update_updated_at()` (pas `update_updated_at_column()`).
 
 ---
 
-## 16. Roadmap
+## 16. Ops & monitoring (Phase 4)
+
+### Health check
+
+`GET /api/health` — retourne :
+- `status` : "healthy" ou "unhealthy"
+- `latency_ms` : temps de reponse DB
+- `version` : SHA du commit Git
+- `checks.database.status` : "ok" ou "fail"
+- HTTP 503 si la DB est inaccessible
+
+### Export audit log
+
+`GET /api/admin/audit-log/export` — telecharge un CSV avec :
+- Date, User, Email, Action, Resource Type, Resource ID, IP, User Agent, Details
+- UTF-8 BOM pour compatibilite Excel
+- Limite : 10 000 entrees
+- Admin uniquement
+
+### Analytics dashboard
+
+`/admin/analytics` — page admin avec :
+- 8 cartes stats (users, active, inactive, clients, apps, documents, pending docs, pending requests)
+- Activite : logins et events (24h + 7 jours)
+- Top 5 apps par nombre d'utilisateurs
+- 5 derniers logins (24h, dedupliques)
+
+---
+
+## 17. Roadmap
 
 | Phase | Contenu | Statut |
 |-------|---------|--------|
 | **Phase 1** | Securite (MFA, rate limit, session timeout, password policy) | ✅ Done |
 | **Phase 2** | UX collaborateur (notifications, invitations, filtres, icones, i18n, multi-entite) | ✅ Done |
-| **Phase 3** | Espace client + documents (upload, dossiers, approve/reject) | ✅ Partiellement (reste: workflows, signatures, notifications client) |
-| **Phase 4** | Ops & monitoring (health check, export audit, analytics, webhooks) | Planifie 2027 |
+| **Phase 3** | Espace client + documents (upload, dossiers, demandes, notifications) | ✅ Done |
+| **Phase 4** | Ops & monitoring (health check, export audit, analytics) | ✅ Done |
+| **A venir** | Signatures electroniques, audit trail client, webhooks Slack/Teams | Planifie |
