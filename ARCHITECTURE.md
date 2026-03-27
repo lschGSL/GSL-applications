@@ -541,7 +541,7 @@ Base sur **shadcn/ui** (Radix UI + Tailwind) :
 
 ## 14. Pattern d'integration d'une nouvelle app
 
-Pour integrer une app (ex: "Agent Fiscal") dans le portail :
+Pour integrer une app dans le portail :
 
 ### Cote portail
 1. **Enregistrer l'app** dans Admin -> Apps -> Add Application
@@ -554,9 +554,65 @@ Pour integrer une app (ex: "Agent Fiscal") dans le portail :
 4. Respecter le design system GSL (voir `INTEGRATION-GUIDE.md`)
 5. **Ne PAS creer de login propre** — tout passe par le portail
 
+### Applications integrees
+
+| App | URL Production | URL Vercel | Slug |
+|-----|---------------|------------|------|
+| GSL News | — | gsl-news-portal.vercel.app | `gsl-news` |
+| Bank Extractor | bank.gsl.lu | gsl-bank-extractor.vercel.app | `bank-extractor` |
+| POS Extractor | — | gsl-pos-extractor.vercel.app | `gsl-pos-extractor` |
+
+Voir `BANK_EXTRACTOR_PORTAL_INTEGRATION.md` pour les details specifiques du Bank Extractor.
+
 ---
 
-## 15. Migrations
+## 15. Signatures electroniques
+
+### Signature simple (implementee)
+- Admin envoie un document pour signature a un ou plusieurs signataires
+- Chaque signataire recoit un email "Signature requise"
+- Le signataire confirme son identite par mot de passe
+- Hash SHA-256 genere : `document_id + signer_id + timestamp + file_path`
+- IP, user-agent, et horodatage enregistres
+- Badge "Signe" affiche sur le document
+
+### Multi-signataires
+- Table `signature_requests` : lien document → signataire
+- Admin choisit plusieurs signataires dans un dialog avec recherche
+- Chaque signataire signe independamment
+- Statut par signataire : pending / signed / declined
+
+### API Signatures
+
+| Methode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/documents/[id]/sign` | Signer un document (password required) |
+| GET | `/api/documents/[id]/signatures` | Liste des signatures d'un document |
+| GET/POST | `/api/documents/[id]/signature-requests` | Liste/creer demandes de signature |
+
+### Prepare pour LuxTrust
+- Champ `method` : `simple` | `luxtrust` | `docusign`
+- Champ `metadata` (jsonb) pour donnees provider-specifiques
+
+---
+
+## 16. Webhooks (Slack/Teams)
+
+Notifications fire-and-forget vers Slack et/ou Microsoft Teams :
+
+| Evenement | Fonction |
+|-----------|----------|
+| Nouvel utilisateur | `webhookNewUser()` |
+| Demande d'acces app | `webhookAccessRequest()` |
+| Document uploade | `webhookDocumentUploaded()` |
+| Document approuve/rejete | `webhookDocumentStatusChanged()` |
+| Alerte securite | `webhookSecurityAlert()` |
+
+Configuration : `SLACK_WEBHOOK_URL` et/ou `TEAMS_WEBHOOK_URL` dans les variables d'environnement.
+
+---
+
+## 17. Migrations
 
 | Migration | Description |
 |-----------|-------------|
@@ -567,12 +623,26 @@ Pour integrer une app (ex: "Agent Fiscal") dans le portail :
 | `005_default_app_icons.sql` | Icones par defaut (ui-avatars.com) pour apps sans icon_url |
 | `006_client_documents.sql` | Role client, tables document_folders et documents, RLS |
 | `007_document_requests.sql` | Demandes de documents (workflow GSL -> client) |
+| `008_document_signatures.sql` | Signatures electroniques + champs signature sur documents |
+| `009_signature_requests.sql` | Demandes de signature multi-signataires |
+| `010_seed_bank_extractor.sql` | Enregistrement Bank Extractor + acces pour tous les users |
 
 **Note** : La trigger function s'appelle `update_updated_at()` (pas `update_updated_at_column()`).
 
 ---
 
-## 16. Ops & monitoring (Phase 4)
+## 18. Domaines et DNS
+
+| Domaine | Projet Vercel | CNAME |
+|---------|--------------|-------|
+| `apps.gsl.lu` | gsl-applications | `59aa5de9ef573003.vercel-dns-017.com` |
+| `bank.gsl.lu` | gsl-bank-extractor | `098e81d113c2abed.vercel-dns-017.com` |
+
+DNS gere chez **vo.lu**. Email (Resend) configure avec domaine `gsl.lu` verifie (DKIM + SPF).
+
+---
+
+## 19. Ops & monitoring (Phase 4)
 
 ### Health check
 
@@ -601,12 +671,13 @@ Pour integrer une app (ex: "Agent Fiscal") dans le portail :
 
 ---
 
-## 17. Roadmap
+## 20. Roadmap
 
 | Phase | Contenu | Statut |
 |-------|---------|--------|
 | **Phase 1** | Securite (MFA, rate limit, session timeout, password policy) | ✅ Done |
 | **Phase 2** | UX collaborateur (notifications, invitations, filtres, icones, i18n, multi-entite) | ✅ Done |
-| **Phase 3** | Espace client + documents (upload, dossiers, demandes, notifications) | ✅ Done |
-| **Phase 4** | Ops & monitoring (health check, export audit, analytics) | ✅ Done |
-| **A venir** | Signatures electroniques, audit trail client, webhooks Slack/Teams | Planifie |
+| **Phase 3** | Espace client + documents (upload, dossiers, demandes, signatures, notifications) | ✅ Done |
+| **Phase 4** | Ops & monitoring (health check, export audit, analytics, webhooks) | ✅ Done |
+| **Phase 5** | Integration apps (Bank Extractor, POS Extractor, GSL News) | ✅ Done |
+| **A venir** | Audit trail client, LuxTrust integration | Planifie |
