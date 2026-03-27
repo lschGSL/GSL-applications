@@ -258,7 +258,7 @@ export function DocumentBrowser({
                         >
                           <Download className="h-4 w-4" />
                         </Button>
-                        {!doc.signed_at && (doc.signature_required || doc.status === "approved") && (
+                        {!doc.signed_at && doc.signature_required && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -271,7 +271,7 @@ export function DocumentBrowser({
                         )}
                         {isAdmin && actionLoading !== doc.id && (
                           <>
-                            {!doc.signed_at && doc.status === "approved" && (
+                            {!doc.signed_at && (
                               <Button variant="ghost" size="sm" className="text-amber-600" title={t("signatures.sendForSignature")} onClick={() => setSendForSigDoc({ id: doc.id, name: doc.name, clientId: doc.client_id })}>
                                 <Send className="h-4 w-4" />
                               </Button>
