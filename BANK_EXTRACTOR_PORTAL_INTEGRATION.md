@@ -235,14 +235,18 @@ A configurer selon la plateforme de deploiement du portail.
 
 ## Checklist d'integration
 
-- [ ] Deployer le portail GSL Apps sur `apps.gsl.lu`
-- [ ] Configurer la page `/login` avec support du parametre `redirect`
-- [ ] Ajouter le Bank Extractor au catalogue d'applications
-- [ ] Accorder l'acces a tous les utilisateurs GSL
+- [x] Deployer le portail GSL Apps sur `apps.gsl.lu` *(deploye sur gsl-applications.vercel.app)*
+- [x] Configurer la page `/login` avec support du parametre `redirect` *(deja supporte)*
+- [x] Ajouter le Bank Extractor au catalogue d'applications *(migration 010)*
+- [x] Accorder l'acces a tous les utilisateurs GSL *(migration 010)*
+- [x] Domaines `*.gsl.lu` et `*.vercel.app` autorises pour les redirects externes
 - [ ] Retirer le bypass d'auth dans `web/src/middleware.ts` du Bank Extractor
 - [ ] Configurer le domaine `bank.gsl.lu` (Vercel + DNS)
 - [ ] Configurer le domaine `apps.gsl.lu` (portail + DNS)
 - [ ] Mettre a jour `NEXT_PUBLIC_APP_URL` dans Railway avec `https://bank.gsl.lu`
+- [ ] Ajouter `https://gsl-bank-extractor.vercel.app/auth/callback` aux Supabase Redirect URLs
+- [ ] Ajouter `https://bank.gsl.lu/auth/callback` aux Supabase Redirect URLs
+- [ ] Executer migration 010 dans Supabase SQL Editor
 - [ ] Tester le flux complet : portail login -> Bank Extractor -> extraction -> export
 - [ ] Verifier les RLS : chaque utilisateur ne voit que ses propres jobs
 
