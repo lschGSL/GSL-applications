@@ -132,6 +132,7 @@ src/
 | GSL News | gsl-news-portal.vercel.app | `gsl-news` | Active |
 | Bank Extractor | bank.gsl.lu / gsl-bank-extractor.vercel.app | `bank-extractor` | Active |
 | POS Extractor | gsl-pos-extractor.vercel.app | `gsl-pos-extractor` | Active |
+| Agent Fiscal | gsl-agent-fiscal.vercel.app | `agent-fiscal` | Active |
 
 ## Domains
 
@@ -193,6 +194,7 @@ Optional:
 | `008_document_signatures.sql` | Document signatures + signature_required/signed_at on documents |
 | `009_signature_requests.sql` | Multi-signer signature requests |
 | `010_seed_bank_extractor.sql` | Register Bank Extractor app + grant access to all users |
+| `011_seed_agent_fiscal.sql` | Register Agent Fiscal app + grant access to all users |
 
 ## Roadmap
 
@@ -255,6 +257,7 @@ Contexte metier : fiduciaire/revision au Luxembourg (GSL Fiduciaire + GSL Revisi
 | Bank Extractor (bank.gsl.lu) — SSO, catalogue, acces auto | ✅ Done |
 | POS Extractor — integration existante | ✅ Done |
 | GSL News — integration existante | ✅ Done |
+| Agent Fiscal — SSO, catalogue, acces auto | ✅ Done |
 
 ### Planning previsionnel
 
