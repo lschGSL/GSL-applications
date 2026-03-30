@@ -152,6 +152,11 @@
       "accountStatus": "Account Status",
       "addUser": "Add User",
       "userCreated": "User created successfully!",
+      "invitationSent": "Invitation sent! The user will receive an email to set their password.",
+      "inviteHint": "An invitation email will be sent. The user will choose their password on first login.",
+      "sendInvite": "Send Invitation",
+      "pendingInvitation": "Invitation pending",
+      "pendingInvitationHint": "The user has not yet activated their account.",
       "inviteUser": "Invite User",
       "inviteTitle": "Invite User",
       "inviteSent": "Invitation sent successfully!",
@@ -298,6 +303,13 @@
     "member": "Member",
     "viewer": "Viewer",
     "client": "Client"
+  },
+  "welcome": {
+    "title": "Welcome to GSL",
+    "subtitle": "Set your password to activate your account.",
+    "choosePassword": "Choose your password",
+    "activateAccount": "Activate my account",
+    "securityHint": "Your password must be at least 12 characters and include an uppercase letter, a number, and a special character."
   },
   "signatures": {
     "signDocument": "Sign Document",

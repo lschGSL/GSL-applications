@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/auth/actions";
 import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/admin/search-input";
@@ -57,10 +57,23 @@ export default async function UsersPage({
   const statusFilter = params.status ?? "";
 
   const supabase = await createClient();
+  const serviceClient = await createServiceClient();
+
   const { data: allUsers } = await supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
+
+  // Fetch pending invitations (users who haven't confirmed email)
+  const pendingUserIds = new Set<string>();
+  const { data: authUsers } = await serviceClient.auth.admin.listUsers();
+  if (authUsers?.users) {
+    for (const u of authUsers.users) {
+      if (!u.email_confirmed_at) {
+        pendingUserIds.add(u.id);
+      }
+    }
+  }
 
   // Text search
   let users = query
@@ -114,7 +127,7 @@ export default async function UsersPage({
         <FilterBar filters={userFilters} />
       </div>
 
-      <UsersTable users={users ?? []} currentUserId={profile.id} />
+      <UsersTable users={users ?? []} currentUserId={profile.id} pendingUserIds={pendingUserIds} />
     </div>
   );
 }

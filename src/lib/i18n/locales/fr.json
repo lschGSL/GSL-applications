@@ -152,6 +152,11 @@
       "accountStatus": "Statut du compte",
       "addUser": "Ajouter un utilisateur",
       "userCreated": "Utilisateur cree avec succes !",
+      "invitationSent": "Invitation envoyee ! L'utilisateur recevra un email pour definir son mot de passe.",
+      "inviteHint": "Un email d'invitation sera envoye. L'utilisateur choisira son mot de passe a la premiere connexion.",
+      "sendInvite": "Envoyer l'invitation",
+      "pendingInvitation": "Invitation en attente",
+      "pendingInvitationHint": "L'utilisateur n'a pas encore active son compte.",
       "inviteUser": "Inviter un utilisateur",
       "inviteTitle": "Inviter un utilisateur",
       "inviteSent": "Invitation envoyée avec succès !",
@@ -298,6 +303,13 @@
     "member": "Membre",
     "viewer": "Lecteur",
     "client": "Client"
+  },
+  "welcome": {
+    "title": "Bienvenue chez GSL",
+    "subtitle": "Definissez votre mot de passe pour activer votre compte.",
+    "choosePassword": "Choisissez votre mot de passe",
+    "activateAccount": "Activer mon compte",
+    "securityHint": "Votre mot de passe doit contenir au moins 12 caracteres, une majuscule, un chiffre et un caractere special."
   },
   "signatures": {
     "signDocument": "Signer le document",

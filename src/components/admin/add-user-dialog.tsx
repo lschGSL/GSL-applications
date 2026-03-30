@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserPlus, X, Loader2 } from "lucide-react";
+import { Mail, X, Loader2, Info } from "lucide-react";
 import { useI18n } from "@/lib/i18n/context";
 
 export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
@@ -22,16 +22,9 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
     setSuccess(false);
 
     const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
     const full_name = formData.get("full_name") as string;
     const role = formData.get("role") as string;
     const entity = formData.get("entity") as string;
-
-    if (password.length < 12) {
-      setError(t("auth.minChars"));
-      setLoading(false);
-      return;
-    }
 
     try {
       const res = await fetch("/api/admin/users", {
@@ -39,7 +32,6 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          password,
           full_name: full_name || null,
           role: role || "member",
           entity: entity || null,
@@ -57,7 +49,7 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
       setTimeout(() => {
         router.push("/admin/users");
         router.refresh();
-      }, 1000);
+      }, 1500);
     } catch {
       setError(t("common.networkError"));
     } finally {
@@ -69,7 +61,7 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
     <>
       <Button type="button" variant="outline" asChild>
         <Link href="/admin/users?add=true">
-          <UserPlus className="mr-2 h-4 w-4" /> {t("admin.users.addUser")}
+          <Mail className="mr-2 h-4 w-4" /> {t("admin.users.addUser")}
         </Link>
       </Button>
 
@@ -92,7 +84,7 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
               )}
               {success && (
                 <div className="mb-4 rounded-lg bg-green-500/10 p-3 text-sm text-green-600">
-                  {t("admin.users.userCreated")}
+                  {t("admin.users.invitationSent")}
                 </div>
               )}
               <form action={handleSubmit} className="space-y-4">
@@ -103,10 +95,12 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("auth.email")} *</label>
                   <Input name="email" type="email" placeholder={t("auth.emailPlaceholder")} required />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("auth.password")} *</label>
-                  <Input name="password" type="password" placeholder={t("auth.minChars")} required minLength={12} />
+                  <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2.5">
+                    <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      {t("admin.users.inviteHint")}
+                    </p>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("admin.users.role")}</label>
@@ -138,8 +132,12 @@ export function AddUserDialog({ showDialog }: { showDialog: boolean }) {
                     <Link href="/admin/users">{t("common.cancel")}</Link>
                   </Button>
                   <Button type="submit" className="flex-1" disabled={loading || success}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t("admin.users.addUser")}
+                    {loading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Mail className="mr-2 h-4 w-4" />
+                    )}
+                    {t("admin.users.sendInvite")}
                   </Button>
                 </div>
               </form>

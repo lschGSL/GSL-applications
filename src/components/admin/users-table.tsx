@@ -19,9 +19,11 @@ const roleColors: Record<string, "default" | "secondary" | "destructive" | "outl
 export function UsersTable({
   users,
   currentUserId,
+  pendingUserIds = new Set(),
 }: {
   users: Profile[];
   currentUserId: string;
+  pendingUserIds?: Set<string>;
 }) {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const { t } = useI18n();
@@ -89,9 +91,15 @@ export function UsersTable({
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant={user.is_active ? "success" : "destructive"}>
-                        {user.is_active ? t("common.active") : t("common.inactive")}
-                      </Badge>
+                      {pendingUserIds.has(user.id) ? (
+                        <Badge variant="warning" title={t("admin.users.pendingInvitationHint")}>
+                          {t("admin.users.pendingInvitation")}
+                        </Badge>
+                      ) : (
+                        <Badge variant={user.is_active ? "success" : "destructive"}>
+                          {user.is_active ? t("common.active") : t("common.inactive")}
+                        </Badge>
+                      )}
                     </td>
                     <td className="hidden lg:table-cell px-6 py-4 text-sm text-muted-foreground">
                       {formatDate(user.created_at)}

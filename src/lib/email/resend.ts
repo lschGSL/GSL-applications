@@ -224,6 +224,54 @@ export async function sendSignatureRequestNotification({
   });
 }
 
+export async function sendWelcomeEmail({
+  email,
+  fullName,
+  invitedBy,
+  role,
+  entity,
+  portalUrl,
+}: {
+  email: string;
+  fullName: string | null;
+  invitedBy: string;
+  role: string;
+  entity: string | null;
+  portalUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  const entityLabel = entity === "gsl_fiduciaire" ? "GSL Fiduciaire" : entity === "gsl_revision" ? "GSL Révision" : entity === "both" ? "GSL Fiduciaire & GSL Révision" : null;
+  const greeting = fullName ? `Bonjour <strong>${fullName}</strong>,` : "Bonjour,";
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [email],
+    subject: `[${APP_NAME}] Votre accès GSL Apps est prêt`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="text-align: center; padding: 24px 0;">
+          <h1 style="color: #e62a34; font-size: 24px; margin: 0;">GSL Apps</h1>
+        </div>
+        <h2 style="color: #1a1a1a;">Bienvenue sur le portail GSL</h2>
+        <p>${greeting}</p>
+        <p><strong>${invitedBy}</strong> vous a créé un accès au portail GSL Apps en tant que <strong>${role}</strong>${entityLabel ? ` pour <strong>${entityLabel}</strong>` : ""}.</p>
+        <p>Vous allez recevoir un email de Supabase avec un lien pour activer votre compte et choisir votre mot de passe.</p>
+        <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 24px 0;">
+          <p style="margin: 0 0 8px; font-weight: bold;">Vos informations :</p>
+          <p style="margin: 0; color: #666;">Email : <strong>${email}</strong></p>
+          <p style="margin: 4px 0 0; color: #666;">Rôle : <strong>${role}</strong></p>
+          ${entityLabel ? `<p style="margin: 4px 0 0; color: #666;">Entité : <strong>${entityLabel}</strong></p>` : ""}
+        </div>
+        <p><a href="${portalUrl}" style="display: inline-block; padding: 12px 24px; background: #e62a34; color: white; text-decoration: none; border-radius: 9999px; font-weight: 500;">Accéder au portail GSL Apps</a></p>
+        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
+        <p style="color: #666; font-size: 12px;">${APP_NAME} — fiduciaire | révision | management</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendInvitationEmail({
   email,
   invitedBy,
