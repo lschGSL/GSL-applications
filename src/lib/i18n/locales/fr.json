@@ -86,6 +86,7 @@
     "auditLog": "Journal d'audit",
     "settings": "Paramètres",
     "clientManagement": "Gestion des clients",
+    "authLogs": "Auth Logs",
     "analytics": "Analytique",
     "myDocuments": "Mes documents"
   },
@@ -317,6 +318,26 @@
     "member": "Membre",
     "viewer": "Lecteur",
     "client": "Client"
+  },
+  "authLogs": {
+    "title": "Auth Logs",
+    "subtitle": "Historique complet des evenements d'authentification et surveillance securite.",
+    "exportCSV": "Exporter CSV",
+    "totalEvents": "Total evenements",
+    "successfulLogins": "Connexions reussies",
+    "failedAttempts": "Tentatives echouees",
+    "activeUsers": "Utilisateurs actifs",
+    "activityChart": "Activite (24 dernieres heures)",
+    "success": "Succes",
+    "failures": "Echecs",
+    "searchPlaceholder": "Rechercher par utilisateur, email, IP ou evenement...",
+    "resetFilters": "Reinitialiser les filtres",
+    "time": "Heure",
+    "user": "Utilisateur",
+    "event": "Evenement",
+    "details": "Details",
+    "noEvents": "Aucun evenement d'authentification trouve.",
+    "of": "sur"
   },
   "welcome": {
     "title": "Bienvenue chez GSL",

@@ -86,6 +86,7 @@
     "auditLog": "Audit-Protokoll",
     "settings": "Einstellungen",
     "clientManagement": "Kundenverwaltung",
+    "authLogs": "Auth Logs",
     "analytics": "Analytik",
     "myDocuments": "Meine Dokumente"
   },
@@ -317,6 +318,26 @@
     "member": "Mitglied",
     "viewer": "Betrachter",
     "client": "Kunde"
+  },
+  "authLogs": {
+    "title": "Auth Logs",
+    "subtitle": "Vollstandiger Verlauf der Authentifizierungsereignisse und Sicherheitsuberwachung.",
+    "exportCSV": "CSV exportieren",
+    "totalEvents": "Ereignisse gesamt",
+    "successfulLogins": "Erfolgreiche Anmeldungen",
+    "failedAttempts": "Fehlgeschlagene Versuche",
+    "activeUsers": "Aktive Benutzer",
+    "activityChart": "Aktivitat (letzte 24h)",
+    "success": "Erfolg",
+    "failures": "Fehlschlage",
+    "searchPlaceholder": "Nach Benutzer, E-Mail, IP oder Ereignis suchen...",
+    "resetFilters": "Filter zurucksetzen",
+    "time": "Zeit",
+    "user": "Benutzer",
+    "event": "Ereignis",
+    "details": "Details",
+    "noEvents": "Keine Authentifizierungsereignisse gefunden.",
+    "of": "von"
   },
   "welcome": {
     "title": "Willkommen bei GSL",
