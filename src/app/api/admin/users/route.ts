@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { webhookNewUser } from "@/lib/webhooks";
+import { sendWelcomeEmail } from "@/lib/email/resend";
 
-// Create a new user directly (admin/manager only)
+// Invite a new user (admin/manager only)
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
 
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
@@ -23,14 +24,10 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { email, password, full_name, role, entity } = body;
+  const { email, full_name, role, entity } = body;
 
-  if (!email || !password) {
-    return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
-  }
-
-  if (password.length < 12) {
-    return NextResponse.json({ error: "Password must be at least 12 characters" }, { status: 400 });
+  if (!email) {
+    return NextResponse.json({ error: "Email is required" }, { status: 400 });
   }
 
   const validRoles = ["admin", "manager", "member", "viewer", "client"];
@@ -38,13 +35,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
-  // Create auth user via service role (bypasses email confirmation)
+  // Build redirect URL from request headers
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3000";
+  const proto = headersList.get("x-forwarded-proto") || "http";
+  const portalUrl = `${proto}://${host}`;
+
+  // Invite user via Supabase (sends magic link email for password setup)
   const serviceClient = await createServiceClient();
-  const { data: authData, error: authError } = await serviceClient.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: full_name || null },
+  const { data: authData, error: authError } = await serviceClient.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${portalUrl}/auth/callback?next=/welcome`,
+    data: {
+      full_name: full_name || null,
+      role: role || "member",
+      entity: entity || null,
+    },
   });
 
   if (authError) {
@@ -66,14 +71,23 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Send branded GSL welcome email via Resend
+  sendWelcomeEmail({
+    email,
+    fullName: full_name || null,
+    invitedBy: profile.full_name || "GSL",
+    role: role || "member",
+    entity: entity || null,
+    portalUrl,
+  }).catch(() => {});
+
   // Audit log
-  const headersList = await headers();
   await supabase.from("audit_logs").insert({
     user_id: user.id,
     action: "create",
     resource_type: "user",
     resource_id: authData.user?.id,
-    details: { email, role: role || "member", entity: entity || null },
+    details: { email, role: role || "member", entity: entity || null, method: "invite" },
     ip_address: headersList.get("x-forwarded-for") || "unknown",
     user_agent: headersList.get("user-agent"),
   });
