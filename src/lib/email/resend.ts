@@ -272,6 +272,41 @@ export async function sendWelcomeEmail({
   });
 }
 
+export async function sendPasswordResetEmail({
+  email,
+  fullName,
+  resetUrl,
+  portalUrl,
+}: {
+  email: string;
+  fullName: string | null;
+  resetUrl: string;
+  portalUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  const greeting = fullName ? `Bonjour <strong>${fullName}</strong>,` : "Bonjour,";
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [email],
+    subject: `[${APP_NAME}] Réinitialisation de votre mot de passe`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1a1a1a;">Réinitialisation de mot de passe</h2>
+        <p>${greeting}</p>
+        <p>Un administrateur a demandé la réinitialisation de votre mot de passe sur ${APP_NAME}.</p>
+        <p>Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe :</p>
+        <p><a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background: #e62a34; color: white; text-decoration: none; border-radius: 9999px; font-weight: 500;">Réinitialiser mon mot de passe</a></p>
+        <p style="color: #666; font-size: 14px;">Ce lien est valable pendant 24 heures.</p>
+        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
+        <p style="color: #666; font-size: 12px;">${APP_NAME} — fiduciaire | révision | management</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendInvitationEmail({
   email,
   invitedBy,

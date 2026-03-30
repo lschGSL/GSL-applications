@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
-// List all active users (for signer picker, admin only)
+// List all active users with auth metadata (for admin panels)
 export async function GET() {
   const supabase = await createClient();
 
@@ -26,5 +26,30 @@ export async function GET() {
     .eq("is_active", true)
     .order("full_name");
 
-  return NextResponse.json(data ?? []);
+  // Enrich with auth metadata
+  const serviceClient = await createServiceClient();
+  const { data: authUsers } = await serviceClient.auth.admin.listUsers();
+
+  const authMap = new Map<string, {
+    last_sign_in_at: string | null;
+    email_confirmed_at: string | null;
+    created_at: string;
+  }>();
+
+  if (authUsers?.users) {
+    for (const u of authUsers.users) {
+      authMap.set(u.id, {
+        last_sign_in_at: u.last_sign_in_at || null,
+        email_confirmed_at: u.email_confirmed_at || null,
+        created_at: u.created_at,
+      });
+    }
+  }
+
+  const enriched = (data ?? []).map((u) => ({
+    ...u,
+    auth: authMap.get(u.id) || null,
+  }));
+
+  return NextResponse.json(enriched);
 }
