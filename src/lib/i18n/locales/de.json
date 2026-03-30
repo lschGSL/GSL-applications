@@ -304,6 +304,13 @@
     "viewer": "Betrachter",
     "client": "Kunde"
   },
+  "welcome": {
+    "title": "Willkommen bei GSL",
+    "subtitle": "Legen Sie Ihr Passwort fest, um Ihr Konto zu aktivieren.",
+    "choosePassword": "Wahlen Sie Ihr Passwort",
+    "activateAccount": "Mein Konto aktivieren",
+    "securityHint": "Ihr Passwort muss mindestens 12 Zeichen lang sein und einen Grossbuchstaben, eine Zahl und ein Sonderzeichen enthalten."
+  },
   "signatures": {
     "signDocument": "Dokument unterschreiben",
     "sign": "Unterschreiben",

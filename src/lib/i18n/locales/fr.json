@@ -304,6 +304,13 @@
     "viewer": "Lecteur",
     "client": "Client"
   },
+  "welcome": {
+    "title": "Bienvenue chez GSL",
+    "subtitle": "Definissez votre mot de passe pour activer votre compte.",
+    "choosePassword": "Choisissez votre mot de passe",
+    "activateAccount": "Activer mon compte",
+    "securityHint": "Votre mot de passe doit contenir au moins 12 caracteres, une majuscule, un chiffre et un caractere special."
+  },
   "signatures": {
     "signDocument": "Signer le document",
     "sign": "Signer",

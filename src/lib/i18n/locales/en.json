@@ -304,6 +304,13 @@
     "viewer": "Viewer",
     "client": "Client"
   },
+  "welcome": {
+    "title": "Welcome to GSL",
+    "subtitle": "Set your password to activate your account.",
+    "choosePassword": "Choose your password",
+    "activateAccount": "Activate my account",
+    "securityHint": "Your password must be at least 12 characters and include an uppercase letter, a number, and a special character."
+  },
   "signatures": {
     "signDocument": "Sign Document",
     "sign": "Sign",

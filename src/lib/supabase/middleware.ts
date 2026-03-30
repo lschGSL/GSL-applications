@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/mfa-verify", "/auth/callback", "/auth/exchange"];
+const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/mfa-verify", "/welcome", "/auth/callback", "/auth/exchange"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -78,7 +78,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users away from auth pages (but allow /auth/exchange, /reset-password, and /mfa-verify)
-  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange") && !request.nextUrl.pathname.startsWith("/reset-password") && !request.nextUrl.pathname.startsWith("/mfa-verify")) {
+  if (user && isPublicPath && !request.nextUrl.pathname.startsWith("/auth/exchange") && !request.nextUrl.pathname.startsWith("/reset-password") && !request.nextUrl.pathname.startsWith("/welcome") && !request.nextUrl.pathname.startsWith("/mfa-verify")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";
