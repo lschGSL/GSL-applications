@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  X, Shield, ShieldCheck, UserCog, Eye, Building, Ban, CheckCircle, Loader2, Mail, Calendar, Clock,
+  X, Shield, ShieldCheck, UserCog, Eye, Building, Ban, CheckCircle, Loader2,
+  Mail, Calendar, Clock, Trash2, KeyRound, Activity,
 } from "lucide-react";
 import { getInitials, formatDate } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -23,9 +24,29 @@ export function UserDetailPanel({
   onClose: () => void;
 }) {
   const [loading, setLoading] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [authInfo, setAuthInfo] = useState<{
+    last_sign_in_at: string | null;
+    email_confirmed_at: string | null;
+    created_at: string;
+  } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const router = useRouter();
   const isSelf = user.id === currentUserId;
   const { t } = useI18n();
+
+  // Fetch auth metadata
+  useEffect(() => {
+    async function loadAuth() {
+      const res = await fetch("/api/admin/users/list");
+      if (res.ok) {
+        const users = await res.json();
+        const found = users.find((u: { id: string }) => u.id === user.id);
+        if (found?.auth) setAuthInfo(found.auth);
+      }
+    }
+    loadAuth();
+  }, [user.id]);
 
   const roles: { value: UserRole; label: string; icon: React.ElementType; color: string }[] = [
     { value: "admin", label: t("roles.admin"), icon: ShieldCheck, color: "bg-red-500/10 text-red-600 border-red-200" },
@@ -59,6 +80,67 @@ export function UserDetailPanel({
     }
   }
 
+  async function deleteUser() {
+    setLoading("delete");
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to delete user");
+        return;
+      }
+      router.refresh();
+      onClose();
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  async function resendInvitation() {
+    setLoading("resend");
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/resend-invitation`, { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to resend invitation");
+        return;
+      }
+      setToast(t("admin.users.invitationResent", { email: user.email }));
+      setTimeout(() => setToast(null), 4000);
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  async function forceResetPassword() {
+    setLoading("reset");
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/reset-password`, { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to send reset email");
+        return;
+      }
+      setToast(t("admin.users.resetSent", { email: user.email }));
+      setTimeout(() => setToast(null), 4000);
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  function timeAgo(dateStr: string | null): string {
+    if (!dateStr) return t("admin.users.neverConnected");
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}min`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `${days}j`;
+  }
+
+  const isPending = authInfo && !authInfo.email_confirmed_at;
+
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
@@ -71,6 +153,14 @@ export function UserDetailPanel({
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Toast */}
+          {toast && (
+            <div className="rounded-lg bg-green-500/10 p-3 text-sm text-green-600 font-medium">
+              {toast}
+            </div>
+          )}
+
+          {/* Profile header */}
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
               {user.avatar_url && <AvatarImage src={user.avatar_url} />}
@@ -87,14 +177,53 @@ export function UserDetailPanel({
                 <span className="text-sm truncate">{user.email}</span>
               </div>
               <div className="flex items-center gap-3 mt-2">
-                <Badge variant={user.is_active ? "success" : "destructive"} className="text-xs">
-                  {user.is_active ? t("common.active") : t("common.inactive")}
-                </Badge>
+                {isPending ? (
+                  <Badge variant="warning" className="text-xs">{t("admin.users.pendingInvitation")}</Badge>
+                ) : (
+                  <Badge variant={user.is_active ? "success" : "destructive"} className="text-xs">
+                    {user.is_active ? t("common.active") : t("common.inactive")}
+                  </Badge>
+                )}
                 {isSelf && <Badge variant="outline" className="text-xs">{t("common.you")}</Badge>}
               </div>
             </div>
           </div>
 
+          {/* Auth Inspector */}
+          {authInfo && (
+            <div>
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                {t("admin.users.accountHealth")}
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                <Card>
+                  <CardContent className="p-3">
+                    <p className="text-xs text-muted-foreground mb-0.5">{t("admin.users.lastLogin")}</p>
+                    <p className="text-sm font-medium">
+                      {authInfo.last_sign_in_at
+                        ? `${timeAgo(authInfo.last_sign_in_at)} — ${formatDate(authInfo.last_sign_in_at)}`
+                        : t("admin.users.neverConnected")}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-3">
+                    <p className="text-xs text-muted-foreground mb-0.5">{t("admin.users.emailConfirmed")}</p>
+                    <p className="text-sm font-medium">
+                      {authInfo.email_confirmed_at ? (
+                        <span className="text-green-600">{formatDate(authInfo.email_confirmed_at)}</span>
+                      ) : (
+                        <span className="text-amber-600">{t("common.no")}</span>
+                      )}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Info cards */}
           <div className="grid grid-cols-2 gap-3">
             <Card>
               <CardContent className="p-3">
@@ -116,6 +245,7 @@ export function UserDetailPanel({
             </Card>
           </div>
 
+          {/* Role section */}
           <div>
             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <Shield className="h-4 w-4" />
@@ -151,6 +281,7 @@ export function UserDetailPanel({
             )}
           </div>
 
+          {/* Entity section */}
           <div>
             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <Building className="h-4 w-4" />
@@ -182,6 +313,7 @@ export function UserDetailPanel({
             </div>
           </div>
 
+          {/* Account Status */}
           <div>
             <h4 className="text-sm font-semibold mb-3">{t("admin.users.accountStatus")}</h4>
             {user.is_active ? (
@@ -210,6 +342,71 @@ export function UserDetailPanel({
             )}
           </div>
 
+          {/* Admin Actions */}
+          {!isSelf && (
+            <div>
+              <h4 className="text-sm font-semibold mb-3">{t("admin.users.adminActions")}</h4>
+              <div className="space-y-2">
+                {/* Resend invitation — only if email not confirmed */}
+                {isPending && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    disabled={loading !== null}
+                    onClick={resendInvitation}
+                  >
+                    {loading === "resend" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+                    {t("admin.users.resendInvitation")}
+                  </Button>
+                )}
+
+                {/* Force password reset */}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={loading !== null}
+                  onClick={forceResetPassword}
+                >
+                  {loading === "reset" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
+                  {t("admin.users.forceResetPassword")}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Danger Zone — Delete */}
+          {!isSelf && (
+            <div className="pt-2 border-t">
+              <h4 className="text-sm font-semibold text-destructive mb-3">{t("admin.users.dangerZone")}</h4>
+              {showDeleteConfirm ? (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+                  <p className="text-sm">
+                    {t("admin.users.deleteConfirm", { name: user.full_name || user.email })}
+                  </p>
+                  <div className="flex gap-3">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowDeleteConfirm(false)} disabled={loading === "delete"}>
+                      {t("common.cancel")}
+                    </Button>
+                    <Button variant="destructive" size="sm" className="flex-1" onClick={deleteUser} disabled={loading === "delete"}>
+                      {loading === "delete" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                      {t("common.delete")}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t("admin.users.deleteUser")}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* User ID */}
           <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground font-mono">ID: {user.id}</p>
           </div>
