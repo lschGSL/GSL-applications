@@ -54,12 +54,18 @@ export async function POST(request: NextRequest) {
     .eq("is_active", true);
 
   if (admins && app && profile) {
+    const host = headersList.get("host") || "localhost:3000";
+    const proto = headersList.get("x-forwarded-proto") || "http";
+
     sendAccessRequestNotification({
       adminEmails: admins.map((a) => a.email),
       userName: profile.full_name || profile.email,
       userEmail: profile.email,
+      userId: user.id,
       appName: app.name,
-    }).catch(() => {}); // Fire and forget
+      appId: app_id,
+      portalUrl: `${proto}://${host}`,
+    }).catch(() => {});
   }
 
   // Webhook

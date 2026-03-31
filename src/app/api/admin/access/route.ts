@@ -3,6 +3,38 @@ import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { sendAccessGrantedNotification, sendAccessRevokedNotification } from "@/lib/email/resend";
 
+// List app access for a user
+export async function GET(request: NextRequest) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || !["admin", "manager"].includes(profile.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const userId = request.nextUrl.searchParams.get("user_id");
+  if (!userId) {
+    return NextResponse.json({ error: "user_id is required" }, { status: 400 });
+  }
+
+  const { data } = await supabase
+    .from("app_access")
+    .select("app_id")
+    .eq("user_id", userId);
+
+  return NextResponse.json((data ?? []).map((a) => a.app_id));
+}
+
 // Grant app access to a user
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
