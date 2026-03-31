@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 
+// List all applications
+export async function GET() {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { data } = await supabase
+    .from("applications")
+    .select("id, name, icon_url, slug, is_active")
+    .eq("is_active", true)
+    .order("name");
+
+  return NextResponse.json(data ?? []);
+}
+
 // Create a new application
 export async function POST(request: NextRequest) {
   const supabase = await createClient();

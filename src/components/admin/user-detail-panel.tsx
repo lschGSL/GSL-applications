@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   X, Shield, ShieldCheck, UserCog, Eye, Building, Ban, CheckCircle, Loader2,
-  Mail, Calendar, Clock, Trash2, KeyRound, Activity,
+  Mail, Calendar, Clock, Trash2, KeyRound, Activity, LayoutGrid,
 } from "lucide-react";
 import { getInitials, formatDate } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -31,21 +31,40 @@ export function UserDetailPanel({
     created_at: string;
   } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [apps, setApps] = useState<{ id: string; name: string; icon_url: string | null }[]>([]);
+  const [userAppIds, setUserAppIds] = useState<Set<string>>(new Set());
+  const [appLoading, setAppLoading] = useState<string | null>(null);
   const router = useRouter();
   const isSelf = user.id === currentUserId;
   const { t } = useI18n();
 
-  // Fetch auth metadata
+  // Fetch auth metadata + apps + access
   useEffect(() => {
-    async function loadAuth() {
-      const res = await fetch("/api/admin/users/list");
-      if (res.ok) {
-        const users = await res.json();
+    async function loadData() {
+      const [authRes, appsRes, accessRes] = await Promise.all([
+        fetch("/api/admin/users/list"),
+        fetch("/api/admin/apps"),
+        fetch(`/api/admin/access?user_id=${user.id}`),
+      ]);
+
+      if (authRes.ok) {
+        const users = await authRes.json();
         const found = users.find((u: { id: string }) => u.id === user.id);
         if (found?.auth) setAuthInfo(found.auth);
       }
+
+      if (appsRes.ok) {
+        const data = await appsRes.json();
+        // GET /api/admin/apps may return array or need to handle different formats
+        setApps(Array.isArray(data) ? data : []);
+      }
+
+      if (accessRes.ok) {
+        const appIds = await accessRes.json();
+        setUserAppIds(new Set(appIds));
+      }
     }
-    loadAuth();
+    loadData();
   }, [user.id]);
 
   const roles: { value: UserRole; label: string; icon: React.ElementType; color: string }[] = [
@@ -93,6 +112,62 @@ export function UserDetailPanel({
       onClose();
     } finally {
       setLoading(null);
+    }
+  }
+
+  async function toggleAppAccess(appId: string, grant: boolean) {
+    setAppLoading(appId);
+    try {
+      if (grant) {
+        await fetch("/api/admin/access", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id, app_id: appId }),
+        });
+        setUserAppIds((prev) => new Set([...prev, appId]));
+      } else {
+        await fetch("/api/admin/access", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id, app_id: appId }),
+        });
+        setUserAppIds((prev) => {
+          const next = new Set(prev);
+          next.delete(appId);
+          return next;
+        });
+      }
+      setToast(grant ? t("admin.users.accessGranted") : t("admin.users.accessRevoked"));
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setAppLoading(null);
+    }
+  }
+
+  async function toggleAllAccess(grant: boolean) {
+    setAppLoading("all");
+    try {
+      for (const app of apps) {
+        const hasAccess = userAppIds.has(app.id);
+        if (grant && !hasAccess) {
+          await fetch("/api/admin/access", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id, app_id: app.id }),
+          });
+        } else if (!grant && hasAccess) {
+          await fetch("/api/admin/access", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id, app_id: app.id }),
+          });
+        }
+      }
+      setUserAppIds(grant ? new Set(apps.map((a) => a.id)) : new Set());
+      setToast(grant ? t("admin.users.allAccessGranted") : t("admin.users.allAccessRevoked"));
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setAppLoading(null);
     }
   }
 
@@ -312,6 +387,79 @@ export function UserDetailPanel({
               })}
             </div>
           </div>
+
+          {/* App Access */}
+          {apps.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold flex items-center gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  {t("admin.users.appAccess")}
+                </h4>
+                <div className="flex gap-1.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs"
+                    disabled={appLoading !== null}
+                    onClick={() => toggleAllAccess(true)}
+                  >
+                    {t("admin.users.grantAll")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-muted-foreground"
+                    disabled={appLoading !== null}
+                    onClick={() => toggleAllAccess(false)}
+                  >
+                    {t("admin.users.revokeAll")}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                {apps.map((app) => {
+                  const hasAccess = userAppIds.has(app.id);
+                  const isLoading = appLoading === app.id || appLoading === "all";
+                  return (
+                    <div
+                      key={app.id}
+                      className="flex items-center justify-between rounded-lg border px-3 py-2"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 overflow-hidden">
+                          {app.icon_url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={app.icon_url} alt="" className="h-7 w-7 object-cover rounded-md" />
+                          ) : (
+                            <LayoutGrid className="h-3.5 w-3.5 text-primary" />
+                          )}
+                        </div>
+                        <span className="text-sm">{app.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {hasAccess ? (
+                          <Badge variant="success" className="text-[10px]">{t("apps.accessGranted")}</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px]">{t("apps.noAccess")}</Badge>
+                        )}
+                        {isLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <button
+                            className={`relative h-5 w-9 rounded-full transition-colors ${hasAccess ? "bg-primary" : "bg-muted"}`}
+                            onClick={() => toggleAppAccess(app.id, !hasAccess)}
+                          >
+                            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${hasAccess ? "left-[18px]" : "left-0.5"}`} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Account Status */}
           <div>
