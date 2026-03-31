@@ -172,6 +172,8 @@
       "lastLogin": "Derniere connexion",
       "neverConnected": "Jamais connecte",
       "emailConfirmed": "Email confirme",
+      "missingProfile": "Profil manquant",
+      "missingProfileHint": "Cet utilisateur existe dans l'auth mais n'a pas de profil en base.",
       "inviteUser": "Inviter un utilisateur",
       "inviteTitle": "Inviter un utilisateur",
       "inviteSent": "Invitation envoyée avec succès !",
