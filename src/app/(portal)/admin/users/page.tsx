@@ -7,6 +7,9 @@ import { FilterBar } from "@/components/admin/filter-bar";
 import { InviteUserDialog } from "@/components/admin/invite-user-dialog";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { UsersTable } from "@/components/admin/users-table";
+import { Upload } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import type { Profile } from "@/types/database";
 
 const userFilters = [
@@ -149,6 +152,11 @@ export default async function UsersPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/users/import">
+              <Upload className="mr-2 h-4 w-4" /> Import
+            </Link>
+          </Button>
           <AddUserDialog showDialog={params.add === "true"} />
           <InviteUserDialog showDialog={params.invite === "true"} />
           <Badge variant="secondary">{users.length} users</Badge>

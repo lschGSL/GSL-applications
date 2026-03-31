@@ -328,6 +328,28 @@
     "viewer": "Viewer",
     "client": "Client"
   },
+  "import": {
+    "title": "Import Users",
+    "subtitle": "Import users in bulk from a CSV or Excel file.",
+    "templateTitle": "1. Download Template",
+    "templateDesc": "Download the Excel template with the expected columns and fill in your data.",
+    "downloadTemplate": "Download Excel Template",
+    "uploadTitle": "2. Upload File",
+    "dragDrop": "Drag and drop or click to select a file",
+    "preview": "Preview",
+    "validUsers": "valid users",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "clear": "Clear",
+    "sendInvitations": "Send Invitations",
+    "valid": "Valid",
+    "invalid": "Invalid",
+    "results": "Import Results",
+    "success": "succeeded",
+    "errors": "failed",
+    "invited": "Invited",
+    "backToUsers": "Back to users"
+  },
   "authLogs": {
     "title": "Auth Logs",
     "subtitle": "Complete authentication event history and security monitoring.",

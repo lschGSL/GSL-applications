@@ -328,6 +328,28 @@
     "viewer": "Betrachter",
     "client": "Kunde"
   },
+  "import": {
+    "title": "Benutzer importieren",
+    "subtitle": "Importieren Sie Benutzer massenhaft aus einer CSV- oder Excel-Datei.",
+    "templateTitle": "1. Vorlage herunterladen",
+    "templateDesc": "Laden Sie die Excel-Vorlage mit den erwarteten Spalten herunter und fullen Sie Ihre Daten ein.",
+    "downloadTemplate": "Excel-Vorlage herunterladen",
+    "uploadTitle": "2. Datei hochladen",
+    "dragDrop": "Ziehen und ablegen oder klicken zum Auswahlen",
+    "preview": "Vorschau",
+    "validUsers": "gultige Benutzer",
+    "selectAll": "Alle auswahlen",
+    "deselectAll": "Alle abwahlen",
+    "clear": "Loschen",
+    "sendInvitations": "Einladungen senden",
+    "valid": "Gultig",
+    "invalid": "Ungultig",
+    "results": "Importergebnisse",
+    "success": "erfolgreich",
+    "errors": "fehlgeschlagen",
+    "invited": "Eingeladen",
+    "backToUsers": "Zuruck zu Benutzern"
+  },
   "authLogs": {
     "title": "Auth Logs",
     "subtitle": "Vollstandiger Verlauf der Authentifizierungsereignisse und Sicherheitsuberwachung.",

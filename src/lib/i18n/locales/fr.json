@@ -328,6 +328,28 @@
     "viewer": "Lecteur",
     "client": "Client"
   },
+  "import": {
+    "title": "Importer des utilisateurs",
+    "subtitle": "Importez des utilisateurs en masse depuis un fichier CSV ou Excel.",
+    "templateTitle": "1. Telecharger le template",
+    "templateDesc": "Telechargez le template Excel avec les colonnes attendues et remplissez vos donnees.",
+    "downloadTemplate": "Telecharger le template Excel",
+    "uploadTitle": "2. Charger le fichier",
+    "dragDrop": "Glissez-deposez ou cliquez pour selectionner un fichier",
+    "preview": "Apercu",
+    "validUsers": "utilisateurs valides",
+    "selectAll": "Tout selectionner",
+    "deselectAll": "Tout deselectionner",
+    "clear": "Effacer",
+    "sendInvitations": "Envoyer les invitations",
+    "valid": "Valide",
+    "invalid": "Invalide",
+    "results": "Resultats de l'import",
+    "success": "reussis",
+    "errors": "echoues",
+    "invited": "Invite",
+    "backToUsers": "Retour aux utilisateurs"
+  },
   "authLogs": {
     "title": "Auth Logs",
     "subtitle": "Historique complet des evenements d'authentification et surveillance securite.",
