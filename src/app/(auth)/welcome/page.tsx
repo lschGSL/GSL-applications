@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,34 @@ import { useI18n } from "@/lib/i18n/context";
 export default function WelcomePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   const { t } = useI18n();
+
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    async function checkSession() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+
+      // Extract name from metadata
+      const meta = user.user_metadata || {};
+      setUserName(meta.full_name || null);
+
+      setChecking(false);
+    }
+    checkSession();
+  }, [router]);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -54,6 +79,20 @@ export default function WelcomePage() {
     router.push("/dashboard");
   }
 
+  if (checking) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const title = userName
+    ? t("welcome.titleWithName", { name: userName })
+    : t("welcome.title");
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
@@ -61,7 +100,7 @@ export default function WelcomePage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/gsl-logo.png" alt="GSL" className="h-10 w-auto mx-auto" />
         </div>
-        <CardTitle className="text-2xl">{t("welcome.title")}</CardTitle>
+        <CardTitle className="text-2xl">{title}</CardTitle>
         <CardDescription>{t("welcome.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>

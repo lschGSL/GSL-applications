@@ -343,6 +343,7 @@
   },
   "welcome": {
     "title": "Willkommen bei GSL",
+    "titleWithName": "Willkommen, {name}!",
     "subtitle": "Legen Sie Ihr Passwort fest, um Ihr Konto zu aktivieren.",
     "choosePassword": "Wahlen Sie Ihr Passwort",
     "activateAccount": "Mein Konto aktivieren",

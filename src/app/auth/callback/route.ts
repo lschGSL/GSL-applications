@@ -53,24 +53,43 @@ export async function GET(request: NextRequest) {
       session = result.data?.session ?? null;
     }
 
-    if (!error) {
-      // If no explicit `next` was provided (Supabase stripped the redirect),
-      // detect password-recovery sessions and redirect to /reset-password.
-      if (!next && session?.user?.recovery_sent_at) {
-        const recoverySentAt = new Date(
-          session.user.recovery_sent_at
-        ).getTime();
+    if (!error && session) {
+      // Detect invitation: redirect to /welcome for first-time password setup
+      // An invited user has type=invite or type=signup, and hasn't set a password yet
+      if (type === "invite" || type === "magiclink") {
+        const welcomeResponse = NextResponse.redirect(`${origin}/welcome`);
+        response.cookies.getAll().forEach((cookie) => {
+          welcomeResponse.cookies.set(cookie.name, cookie.value);
+        });
+        return welcomeResponse;
+      }
+
+      // Detect password-recovery sessions
+      if (!next && session.user?.recovery_sent_at) {
+        const recoverySentAt = new Date(session.user.recovery_sent_at).getTime();
         const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
         if (recoverySentAt > twoHoursAgo) {
-          const recoveryResponse = NextResponse.redirect(
-            `${origin}/reset-password`
-          );
+          const recoveryResponse = NextResponse.redirect(`${origin}/reset-password`);
           response.cookies.getAll().forEach((cookie) => {
             recoveryResponse.cookies.set(cookie.name, cookie.value);
           });
           return recoveryResponse;
         }
       }
+
+      // Also handle: next=/welcome from inviteUserByEmail redirectTo
+      if (next === "/welcome") {
+        const welcomeResponse = NextResponse.redirect(`${origin}/welcome`);
+        response.cookies.getAll().forEach((cookie) => {
+          welcomeResponse.cookies.set(cookie.name, cookie.value);
+        });
+        return welcomeResponse;
+      }
+
+      return response;
+    }
+
+    if (!error) {
       return response;
     }
   }

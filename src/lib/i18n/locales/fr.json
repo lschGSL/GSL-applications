@@ -343,6 +343,7 @@
   },
   "welcome": {
     "title": "Bienvenue chez GSL",
+    "titleWithName": "Bienvenue, {name} !",
     "subtitle": "Definissez votre mot de passe pour activer votre compte.",
     "choosePassword": "Choisissez votre mot de passe",
     "activateAccount": "Activer mon compte",
