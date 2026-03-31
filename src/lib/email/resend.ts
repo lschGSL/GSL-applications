@@ -18,27 +18,44 @@ export async function sendAccessRequestNotification({
   adminEmails,
   userName,
   userEmail,
+  userId,
   appName,
+  appId,
+  portalUrl,
 }: {
   adminEmails: string[];
   userName: string;
   userEmail: string;
+  userId: string;
   appName: string;
+  appId: string;
+  portalUrl: string;
 }) {
   const resend = getResend();
   if (!resend || adminEmails.length === 0) return;
 
+  const manageUrl = `${portalUrl}/admin/users`;
+  const grantUrl = `${portalUrl}/admin/users?q=${encodeURIComponent(userEmail)}`;
+
   await resend.emails.send({
     from: FROM_EMAIL,
     to: adminEmails,
-    subject: `[${APP_NAME}] Access request: ${userName} → ${appName}`,
+    subject: `[${APP_NAME}] Demande d'accès : ${userName} → ${appName}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">New Access Request</h2>
-        <p><strong>${userName}</strong> (${userEmail}) has requested access to <strong>${appName}</strong>.</p>
-        <p>Please review this request in the admin panel.</p>
+        <h2 style="color: #1a1a1a;">Demande d'accès</h2>
+        <p><strong>${userName}</strong> a demandé l'accès à l'application <strong>${appName}</strong>.</p>
+        <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 16px 0;">
+          <p style="margin: 0 0 4px;"><strong>Utilisateur :</strong> ${userName}</p>
+          <p style="margin: 0 0 4px;"><strong>Email :</strong> ${userEmail}</p>
+          <p style="margin: 0;"><strong>Application :</strong> ${appName}</p>
+        </div>
+        <div style="margin: 24px 0;">
+          <a href="${manageUrl}" style="display: inline-block; padding: 10px 20px; background: #e62a34; color: white; text-decoration: none; border-radius: 9999px; font-weight: 500; margin-right: 12px;">Gérer les accès</a>
+          <a href="${grantUrl}" style="display: inline-block; padding: 10px 20px; background: #16a34a; color: white; text-decoration: none; border-radius: 9999px; font-weight: 500;">Accorder l'accès</a>
+        </div>
         <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
-        <p style="color: #666; font-size: 12px;">${APP_NAME}</p>
+        <p style="color: #666; font-size: 12px;">${APP_NAME} — fiduciaire | révision | management</p>
       </div>
     `,
   });
