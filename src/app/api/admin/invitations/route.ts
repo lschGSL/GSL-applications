@@ -81,8 +81,10 @@ export async function POST(request: NextRequest) {
   });
 
   // Send invitation email
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const signupUrl = `${appUrl}/register?invite=${data.token}`;
+  const host = headersList.get("host") || "localhost:3000";
+  const proto = headersList.get("x-forwarded-proto") || "http";
+  const portalUrl = `${proto}://${host}`;
+  const signupUrl = `${portalUrl}/register?invite=${data.token}`;
 
   sendInvitationEmail({
     email,

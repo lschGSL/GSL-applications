@@ -172,6 +172,8 @@
       "lastLogin": "Letzte Anmeldung",
       "neverConnected": "Nie angemeldet",
       "emailConfirmed": "E-Mail bestatigt",
+      "missingProfile": "Kein Profil",
+      "missingProfileHint": "Dieser Benutzer existiert in der Auth, hat aber kein Profil in der Datenbank.",
       "inviteUser": "Benutzer einladen",
       "inviteTitle": "Benutzer einladen",
       "inviteSent": "Einladung erfolgreich gesendet!",

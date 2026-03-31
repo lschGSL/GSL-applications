@@ -7,6 +7,7 @@ import { FilterBar } from "@/components/admin/filter-bar";
 import { InviteUserDialog } from "@/components/admin/invite-user-dialog";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { UsersTable } from "@/components/admin/users-table";
+import type { Profile } from "@/types/database";
 
 const userFilters = [
   {
@@ -17,6 +18,7 @@ const userFilters = [
       { value: "manager", label: "Manager" },
       { value: "member", label: "Member" },
       { value: "viewer", label: "Viewer" },
+      { value: "client", label: "Client" },
     ],
   },
   {
@@ -35,6 +37,7 @@ const userFilters = [
     options: [
       { value: "active", label: "Active" },
       { value: "inactive", label: "Inactive" },
+      { value: "pending", label: "Pending" },
     ],
   },
 ];
@@ -59,25 +62,51 @@ export default async function UsersPage({
   const supabase = await createClient();
   const serviceClient = await createServiceClient();
 
-  const { data: allUsers } = await supabase
+  // Fetch profiles
+  const { data: profilesData } = await supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Fetch pending invitations (users who haven't confirmed email)
+  // Fetch ALL auth users to find orphans and pending
   const pendingUserIds = new Set<string>();
+  const orphanUserIds = new Set<string>();
+  const profileIds = new Set((profilesData ?? []).map((p) => p.id));
+
   const { data: authUsers } = await serviceClient.auth.admin.listUsers();
+
+  const orphanProfiles: Profile[] = [];
+
   if (authUsers?.users) {
     for (const u of authUsers.users) {
       if (!u.email_confirmed_at) {
         pendingUserIds.add(u.id);
       }
+      // Orphaned: exists in auth but not in profiles
+      if (!profileIds.has(u.id)) {
+        orphanUserIds.add(u.id);
+        const meta = (u.user_metadata || {}) as Record<string, unknown>;
+        orphanProfiles.push({
+          id: u.id,
+          email: u.email || "unknown",
+          full_name: (meta.full_name as string) || null,
+          avatar_url: null,
+          role: (meta.role as string) || "member",
+          entity: (meta.entity as string) || null,
+          is_active: true,
+          created_at: u.created_at,
+          updated_at: u.created_at,
+        } as Profile);
+      }
     }
   }
 
+  // Merge profiles + orphans
+  const allUsers = [...(profilesData ?? []), ...orphanProfiles];
+
   // Text search
   let users = query
-    ? allUsers?.filter(
+    ? allUsers.filter(
         (u) =>
           u.full_name?.toLowerCase().includes(query) ||
           u.email.toLowerCase().includes(query) ||
@@ -86,12 +115,12 @@ export default async function UsersPage({
     : allUsers;
 
   // Role filter
-  if (roleFilter && users) {
+  if (roleFilter) {
     users = users.filter((u) => u.role === roleFilter);
   }
 
   // Entity filter
-  if (entityFilter && users) {
+  if (entityFilter) {
     if (entityFilter === "none") {
       users = users.filter((u) => !u.entity);
     } else {
@@ -100,10 +129,14 @@ export default async function UsersPage({
   }
 
   // Status filter
-  if (statusFilter && users) {
-    users = users.filter((u) =>
-      statusFilter === "active" ? u.is_active : !u.is_active
-    );
+  if (statusFilter) {
+    if (statusFilter === "pending") {
+      users = users.filter((u) => pendingUserIds.has(u.id));
+    } else if (statusFilter === "active") {
+      users = users.filter((u) => u.is_active && !pendingUserIds.has(u.id));
+    } else {
+      users = users.filter((u) => !u.is_active);
+    }
   }
 
   return (
@@ -118,7 +151,7 @@ export default async function UsersPage({
         <div className="flex items-center gap-3">
           <AddUserDialog showDialog={params.add === "true"} />
           <InviteUserDialog showDialog={params.invite === "true"} />
-          <Badge variant="secondary">{users?.length ?? 0} users</Badge>
+          <Badge variant="secondary">{users.length} users</Badge>
         </div>
       </div>
 
@@ -127,7 +160,12 @@ export default async function UsersPage({
         <FilterBar filters={userFilters} />
       </div>
 
-      <UsersTable users={users ?? []} currentUserId={profile.id} pendingUserIds={pendingUserIds} />
+      <UsersTable
+        users={users}
+        currentUserId={profile.id}
+        pendingUserIds={pendingUserIds}
+        orphanUserIds={orphanUserIds}
+      />
     </div>
   );
 }
