@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { LandingContent } from "@/components/landing-content";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function HomePage({
   searchParams,
@@ -18,5 +18,18 @@ export default async function HomePage({
     redirect(`/auth/callback?${qs.toString()}`);
   }
 
-  return <LandingContent />;
+  // Handle Supabase auth errors landing on /
+  if (params.error_code) {
+    redirect("/login");
+  }
+
+  // Check session: redirect to dashboard or login
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
+  redirect("/login");
 }

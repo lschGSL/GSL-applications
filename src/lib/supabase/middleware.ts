@@ -69,11 +69,21 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   );
 
-  // Redirect unauthenticated users to login
-  if (!user && !isPublicPath && request.nextUrl.pathname !== "/") {
+  // Redirect unauthenticated users to login (including /)
+  if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
+    if (request.nextUrl.pathname !== "/") {
+      url.searchParams.set("redirect", request.nextUrl.pathname);
+    }
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect authenticated users on / to dashboard
+  if (user && request.nextUrl.pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 
