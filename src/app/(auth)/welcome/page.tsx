@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { createBrowserClient } from "@supabase/ssr";
 import { PasswordStrength } from "@/components/security/password-strength";
 import { validatePassword } from "@/lib/password";
@@ -16,6 +16,7 @@ export default function WelcomePage() {
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   const { t } = useI18n();
@@ -28,16 +29,12 @@ export default function WelcomePage() {
 
     async function checkSession() {
       const { data: { user } } = await supabase.auth.getUser();
-
       if (!user) {
         router.replace("/login");
         return;
       }
-
-      // Extract name from metadata
       const meta = user.user_metadata || {};
       setUserName(meta.full_name || null);
-
       setChecking(false);
     }
     checkSession();
@@ -81,8 +78,8 @@ export default function WelcomePage() {
 
   if (checking) {
     return (
-      <Card className="w-full max-w-md">
-        <CardContent className="flex items-center justify-center py-12">
+      <Card className="w-full max-w-md border-border shadow-xl">
+        <CardContent className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
@@ -90,40 +87,35 @@ export default function WelcomePage() {
   }
 
   const title = userName
-    ? t("welcome.titleWithName", { name: userName })
+    ? t("welcome.titleWithName", { name: userName.split(" ")[0] })
     : t("welcome.title");
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-3">
+    <Card className="w-full max-w-md border-border shadow-xl">
+      <CardContent className="p-8">
+        <div className="text-center mb-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/gsl-logo.png" alt="GSL" className="h-10 w-auto mx-auto" />
+          <img src="/gsl-logo.png" alt="GSL" className="h-10 w-auto mx-auto mb-4" />
+          <h1 className="text-2xl font-semibold">{title}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("welcome.subtitle")}</p>
+          <div className="border-b mt-4" />
         </div>
-        <CardTitle className="text-2xl">{title}</CardTitle>
-        <CardDescription>{t("welcome.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+
         <div className="mb-6 rounded-lg bg-primary/5 p-4 flex items-start gap-3">
           <ShieldCheck className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            {t("welcome.securityHint")}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("welcome.securityHint")}</p>
         </div>
+
         {error && (
-          <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
         )}
+
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              {t("welcome.choosePassword")}
-            </label>
+            <label className="text-sm font-medium">{t("welcome.choosePassword")}</label>
             <Input
-              id="password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder={t("auth.minChars")}
               required
               minLength={12}
@@ -134,11 +126,8 @@ export default function WelcomePage() {
             <PasswordStrength password={password} />
           </div>
           <div className="space-y-2">
-            <label htmlFor="confirm_password" className="text-sm font-medium">
-              {t("auth.confirmPassword")}
-            </label>
+            <label className="text-sm font-medium">{t("login.confirmPasswordLabel")}</label>
             <Input
-              id="confirm_password"
               name="confirm_password"
               type="password"
               placeholder={t("auth.repeatPassword")}

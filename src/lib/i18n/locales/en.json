@@ -393,6 +393,25 @@
     "noEvents": "No authentication events found.",
     "of": "of"
   },
+  "resetPassword": {
+    "title": "Reset your password",
+    "newPassword": "New password",
+    "confirmNew": "Confirm new password",
+    "saveButton": "Save new password",
+    "successTitle": "Password updated",
+    "successDesc": "Redirecting to dashboard...",
+    "requestNewLink": "Request a new link"
+  },
+  "forgotPassword": {
+    "title": "Forgot password?",
+    "subtitle": "Enter your email address. We will send you a reset link valid for 1 hour.",
+    "sendLink": "Send the link",
+    "sentTitle": "Email sent",
+    "sentDesc": "Check your inbox at {email}.",
+    "validFor": "The link is valid for 1 hour.",
+    "resend": "Resend email",
+    "resendIn": "Resend in {seconds}s"
+  },
   "welcome": {
     "title": "Welcome to GSL",
     "titleWithName": "Welcome, {name}!",

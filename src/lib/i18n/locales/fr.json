@@ -393,6 +393,25 @@
     "noEvents": "Aucun evenement d'authentification trouve.",
     "of": "sur"
   },
+  "resetPassword": {
+    "title": "Reinitialisez votre mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNew": "Confirmer le nouveau mot de passe",
+    "saveButton": "Enregistrer le nouveau mot de passe",
+    "successTitle": "Mot de passe mis a jour",
+    "successDesc": "Redirection vers le tableau de bord...",
+    "requestNewLink": "Demander un nouveau lien"
+  },
+  "forgotPassword": {
+    "title": "Mot de passe oublie ?",
+    "subtitle": "Entrez votre adresse email. Nous vous enverrons un lien de reinitialisation valable 1 heure.",
+    "sendLink": "Envoyer le lien",
+    "sentTitle": "Email envoye",
+    "sentDesc": "Verifiez votre boite mail {email}.",
+    "validFor": "Le lien est valable 1 heure.",
+    "resend": "Renvoyer l'email",
+    "resendIn": "Renvoyer dans {seconds}s"
+  },
   "welcome": {
     "title": "Bienvenue chez GSL",
     "titleWithName": "Bienvenue, {name} !",

@@ -393,6 +393,25 @@
     "noEvents": "Keine Authentifizierungsereignisse gefunden.",
     "of": "von"
   },
+  "resetPassword": {
+    "title": "Passwort zurucksetzen",
+    "newPassword": "Neues Passwort",
+    "confirmNew": "Neues Passwort bestatigen",
+    "saveButton": "Neues Passwort speichern",
+    "successTitle": "Passwort aktualisiert",
+    "successDesc": "Weiterleitung zum Dashboard...",
+    "requestNewLink": "Neuen Link anfordern"
+  },
+  "forgotPassword": {
+    "title": "Passwort vergessen?",
+    "subtitle": "Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum Zurucksetzen, der 1 Stunde gultig ist.",
+    "sendLink": "Link senden",
+    "sentTitle": "E-Mail gesendet",
+    "sentDesc": "Uberprufen Sie Ihr Postfach bei {email}.",
+    "validFor": "Der Link ist 1 Stunde gultig.",
+    "resend": "E-Mail erneut senden",
+    "resendIn": "Erneut senden in {seconds}s"
+  },
   "welcome": {
     "title": "Willkommen bei GSL",
     "titleWithName": "Willkommen, {name}!",
