@@ -324,6 +324,80 @@ export async function sendPasswordResetEmail({
   });
 }
 
+export async function sendPendingApprovalEmail({
+  email,
+  fullName,
+}: {
+  email: string;
+  fullName: string | null;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  const greeting = fullName ? `Bonjour <strong>${fullName}</strong>,` : "Bonjour,";
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [email],
+    subject: `[${APP_NAME}] Demande d'accès reçue`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #1e1f22; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
+          <h1 style="color: #e62a34; font-size: 20px; margin: 0;">GSL Apps</h1>
+        </div>
+        <div style="padding: 32px 24px;">
+          <p>${greeting}</p>
+          <p>Votre demande d'accès à ${APP_NAME} a bien été reçue.</p>
+          <p>Un administrateur GSL validera votre accès dans les plus brefs délais.</p>
+          <p>Vous recevrez un email de confirmation dès que votre compte sera activé.</p>
+        </div>
+        <div style="border-top: 1px solid #e5e5e5; padding: 16px 24px; text-align: center;">
+          <p style="color: #666; font-size: 11px; margin: 0;">GSL Fiduciaire | Luxembourg | info@gsl.lu | Confidentiel</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+export async function sendAccountApprovedEmail({
+  email,
+  fullName,
+  portalUrl,
+}: {
+  email: string;
+  fullName: string | null;
+  portalUrl: string;
+}) {
+  const resend = getResend();
+  if (!resend) return;
+
+  const greeting = fullName ? `Bonjour <strong>${fullName}</strong>,` : "Bonjour,";
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: [email],
+    subject: `[${APP_NAME}] Votre accès GSL Apps est activé`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #1e1f22; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
+          <h1 style="color: #e62a34; font-size: 20px; margin: 0;">GSL Apps</h1>
+        </div>
+        <div style="padding: 32px 24px;">
+          <p>${greeting}</p>
+          <p>Votre compte ${APP_NAME} a été validé par un administrateur.</p>
+          <p>Vous pouvez maintenant accéder au portail et à toutes vos applications.</p>
+          <p style="margin: 24px 0;">
+            <a href="${portalUrl}" style="display: inline-block; padding: 12px 24px; background: #e62a34; color: white; text-decoration: none; border-radius: 9999px; font-weight: 500;">Accéder à GSL Apps</a>
+          </p>
+        </div>
+        <div style="border-top: 1px solid #e5e5e5; padding: 16px 24px; text-align: center;">
+          <p style="color: #666; font-size: 11px; margin: 0;">GSL Fiduciaire | Luxembourg | info@gsl.lu | Confidentiel</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
 export async function sendInvitationEmail({
   email,
   invitedBy,

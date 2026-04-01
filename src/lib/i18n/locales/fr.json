@@ -29,6 +29,26 @@
     "yes": "Oui",
     "no": "Non"
   },
+  "login": {
+    "title": "Bienvenue",
+    "subtitle": "Connectez-vous a GSL Apps",
+    "signupTitle": "Creer un compte",
+    "signupSubtitle": "Rejoignez GSL Apps",
+    "emailLabel": "Adresse email",
+    "passwordLabel": "Mot de passe",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "fullNameLabel": "Nom complet",
+    "forgotPassword": "Mot de passe oublie ?",
+    "signInButton": "Se connecter",
+    "or": "ou",
+    "firstVisit": "Premiere visite ?",
+    "createAccount": "Creer un compte",
+    "createMyAccount": "Creer mon compte",
+    "alreadyHaveAccount": "Deja un compte ? Se connecter",
+    "backToLogin": "Retour a la connexion",
+    "pendingTitle": "Demande recue",
+    "pendingDesc": "Votre compte a ete cree. Un administrateur GSL va valider votre acces dans les plus brefs delais. Vous recevrez un email de confirmation."
+  },
   "auth": {
     "signIn": "Se connecter",
     "signOut": "Se déconnecter",

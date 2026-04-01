@@ -123,7 +123,6 @@ export async function signUp(formData: FormData) {
     password,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   });
 
@@ -135,13 +134,11 @@ export async function signUp(formData: FormData) {
   if (inviteData) {
     const serviceClient = await createServiceClient();
 
-    // Mark invitation as accepted
     await serviceClient
       .from("invitations")
       .update({ accepted_at: new Date().toISOString() })
       .eq("id", inviteData.id);
 
-    // Update profile role/entity (the profile is created by trigger, so we update by email)
     const updates: Record<string, unknown> = { role: inviteData.role };
     if (inviteData.entity) updates.entity = inviteData.entity;
 
@@ -149,9 +146,23 @@ export async function signUp(formData: FormData) {
       .from("profiles")
       .update(updates)
       .eq("email", email);
+  } else {
+    // Self-registration: set as viewer, inactive (pending admin approval)
+    const serviceClient = await createServiceClient();
+    await serviceClient
+      .from("profiles")
+      .update({ role: "viewer", is_active: false })
+      .eq("email", email);
+
+    // Send pending approval email + webhook
+    const { sendPendingApprovalEmail } = await import("@/lib/email/resend");
+    const { webhookNewUser } = await import("@/lib/webhooks");
+
+    sendPendingApprovalEmail({ email, fullName }).catch(() => {});
+    webhookNewUser(fullName || "", email, "viewer (pending)").catch(() => {});
   }
 
-  redirect("/login?message=Check your email to confirm your account");
+  return { success: true };
 }
 
 export async function signOut() {
