@@ -59,6 +59,18 @@ export async function PATCH(
     user_agent: headersList.get("user-agent"),
   });
 
+  // Send account approved email when activating a user
+  if (is_active === true && data) {
+    const host = headersList.get("host") || "localhost:3000";
+    const proto = headersList.get("x-forwarded-proto") || "http";
+    const { sendAccountApprovedEmail } = await import("@/lib/email/resend");
+    sendAccountApprovedEmail({
+      email: data.email,
+      fullName: data.full_name,
+      portalUrl: `${proto}://${host}`,
+    }).catch(() => {});
+  }
+
   return NextResponse.json(data);
 }
 
