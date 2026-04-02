@@ -177,6 +177,9 @@ Optional:
 - **Row-Level Security** is enabled on all Supabase tables.
 - **Supabase trigger function** is named `update_updated_at()` (NOT `update_updated_at_column()`).
 - **Storage bucket** `documents` must have NO MIME type restrictions (validation is done server-side in the upload API).
+- **Toast notifications**: uses `@radix-ui/react-toast` (shadcn/ui). Agent Fiscal uses Sonner — divergence acceptee (voir `MERGE_REPORT.md`).
+- **@supabase/ssr**: aligne a `^0.9.0` sur tous les repos GSL (portail, Agent Fiscal, Bank Extractor).
+- **Migrations**: format `NNN_description.sql` dans ce repo. Futur : migrer vers format Supabase `YYYYMMDDHHMMSS_description.sql`.
 - **Resend domain** `gsl.lu` is verified and active for email sending.
 - **Allowed redirect domains** for SSO: `*.gsl.lu` and `*.vercel.app` (configured in `src/lib/utils.ts`).
 
