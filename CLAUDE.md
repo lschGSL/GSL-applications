@@ -270,3 +270,34 @@ Contexte metier : fiduciaire/revision au Luxembourg (GSL Fiduciaire + GSL Revisi
 - **Q1 2027** → Phase 4 (Ops & monitoring) ✅
 - **Q1 2027** → Phase 5 (Integration apps) ✅
 - **A venir** → Audit trail client, LuxTrust integration
+
+- ## Skills & Resources
+
+Claude Code has access to a `skills/` directory containing 82+ reusable skill files organized by category. Before starting any task, scan the relevant skill(s) for best practices and patterns.
+
+### Skill Categories
+| Directory | Skills | Focus |
+|-----------|--------|-------|
+| `skills/core-stack/` | 10 | Next.js, Supabase, TypeScript, Tailwind, Vercel |
+| `skills/frontend/` | 8 | React patterns, i18n, frontend guidelines |
+| `skills/code-quality/` | 8 | Code review, debugging, refactoring, clean code |
+| `skills/architecture-advanced/` | 7 | API design, database design, ADRs, monorepo |
+| `skills/automation/` | 7 | Email, file uploads, API docs, changelog |
+| `skills/ai-agents/` | 8 | Agent orchestration, memory, tool building |
+| `skills/devops/` | 8 | Docker, git workflows, deployment, PDF, monitoring |
+| `skills/seo-analytics/` | 6 | SEO, analytics tracking |
+| `skills/database/` | 4 | DB admin, optimization, cost |
+| `skills/performance-security/` | 4 | Auth patterns, performance, security hardening |
+| `skills/security/` | 3 | API security, broken auth |
+| `skills/testing-advanced/` | 3 | TDD, Playwright |
+| `skills/ai-prompt/` | 3 | Brainstorming, prompt engineering |
+| `skills/odoo/` | 2 | Odoo deployment, XML views |
+| `skills/web-standards/` | 1 | Accessibility audit |
+
+### How to use skills
+1. Read the `SKILL.md` file in the relevant skill folder before starting work
+2. Follow the patterns, checklists, and references provided
+3. Skills in `skills/coding/` and `skills/architecture/` contain GSL-specific conventions — these take priority over community skills
+
+
+
