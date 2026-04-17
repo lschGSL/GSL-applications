@@ -108,7 +108,84 @@
     "clientManagement": "Client Management",
     "authLogs": "Auth Logs",
     "analytics": "Analytics",
+    "securityDashboard": "Security Dashboard",
     "myDocuments": "My Documents"
+  },
+  "security": {
+    "page": {
+      "title": "Security Dashboard",
+      "subtitle": "Real-time monitoring, security alerts and CSSF compliance."
+    },
+    "kpi": {
+      "activeSessions": "Active Sessions",
+      "failedLogins24h": "Failed Login Attempts (24h)",
+      "suspicious": "Suspicious Activities",
+      "compliance": "Compliance Score"
+    },
+    "sessions": {
+      "title": "Live Sessions",
+      "empty": "No active sessions.",
+      "user": "User",
+      "app": "App",
+      "ip": "IP",
+      "location": "Location",
+      "duration": "Duration",
+      "portal": "Portal",
+      "terminate": "Terminate",
+      "confirmTerminate": "Terminate this user session?"
+    },
+    "alerts": {
+      "title": "Security Alerts",
+      "empty": "No alerts right now.",
+      "unresolvedOnly": "Unresolved only",
+      "markResolved": "Mark resolved",
+      "reopen": "Reopen",
+      "severity": {
+        "all": "All",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "type": {
+        "failed_auth": "Failed auth",
+        "suspicious_access": "Suspicious access",
+        "admin_action": "Admin action",
+        "app_error": "App error",
+        "bulk_export": "Bulk export",
+        "new_device": "New device",
+        "session_expired": "Session expired",
+        "role_change": "Role change"
+      }
+    },
+    "apps": {
+      "title": "Application Health Matrix",
+      "empty": "No applications registered.",
+      "activeUsers": "Active users",
+      "errors24h": "Errors (24h)",
+      "errorRate": "Error rate",
+      "neverScanned": "Never scanned",
+      "scanNow": "Scan now",
+      "scanning": "Scanning…",
+      "status": {
+        "protected": "Protected",
+        "public": "Public",
+        "misconfigured": "Misconfigured",
+        "unknown": "Unknown"
+      }
+    },
+    "compliance": {
+      "title": "CSSF Compliance",
+      "subtitle": "Regulatory indicators over 30 days.",
+      "mfaAdoption": "MFA adoption",
+      "sessionCompliance": "Session compliance",
+      "avgSession": "Average length",
+      "sessions": "sessions",
+      "accessReviews": "User access reviews",
+      "overdue": "overdue",
+      "auditCoverage": "Audit coverage",
+      "generateReport": "Generate report"
+    }
   },
   "landing": {
     "heroTitle1": "Your applications,",

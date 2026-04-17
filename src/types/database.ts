@@ -32,6 +32,9 @@ export interface Application {
   visibility: AppVisibility;
   entity: GslEntity | null;
   is_active: boolean;
+  last_security_scan: string | null;
+  security_status: "protected" | "public" | "misconfigured" | "unknown";
+  health_check_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -145,6 +148,70 @@ export interface DocumentSignature {
   // Joined
   signer_name?: string;
   signer_email?: string;
+}
+
+export type SecurityEventType =
+  | "failed_auth"
+  | "suspicious_access"
+  | "admin_action"
+  | "app_error"
+  | "bulk_export"
+  | "new_device"
+  | "session_expired"
+  | "role_change";
+
+export type SecuritySeverity = "low" | "medium" | "high" | "critical";
+
+export type AppSecurityStatus = "protected" | "public" | "misconfigured" | "unknown";
+
+export interface GeoLocation {
+  country?: string | null;
+  country_code?: string | null;
+  city?: string | null;
+  region?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  flag_emoji?: string | null;
+}
+
+export interface SecurityEvent {
+  id: string;
+  event_type: SecurityEventType;
+  user_id: string | null;
+  app_id: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  geo_location: GeoLocation | null;
+  severity: SecuritySeverity;
+  title: string | null;
+  description: string | null;
+  metadata: Record<string, unknown> | null;
+  resolved: boolean;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  // Joined
+  user_email?: string;
+  user_name?: string;
+  app_name?: string;
+  app_slug?: string;
+}
+
+export interface ActiveSession {
+  id: string;
+  user_id: string;
+  app_slug: string | null;
+  session_token_hash: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  geo_location: GeoLocation | null;
+  started_at: string;
+  last_activity: string;
+  terminated_at: string | null;
+  // Joined
+  user_email?: string;
+  user_name?: string;
+  app_name?: string;
 }
 
 export type SignatureRequestStatus = "pending" | "signed" | "declined";

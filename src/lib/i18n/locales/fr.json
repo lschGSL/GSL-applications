@@ -108,7 +108,84 @@
     "clientManagement": "Gestion des clients",
     "authLogs": "Auth Logs",
     "analytics": "Analytique",
+    "securityDashboard": "Sécurité (Dashboard)",
     "myDocuments": "Mes documents"
+  },
+  "security": {
+    "page": {
+      "title": "Tableau de bord sécurité",
+      "subtitle": "Surveillance en temps réel, alertes de sécurité et conformité CSSF."
+    },
+    "kpi": {
+      "activeSessions": "Sessions actives",
+      "failedLogins24h": "Échecs d'authentification (24h)",
+      "suspicious": "Activités suspectes",
+      "compliance": "Score de conformité"
+    },
+    "sessions": {
+      "title": "Sessions en direct",
+      "empty": "Aucune session active.",
+      "user": "Utilisateur",
+      "app": "Application",
+      "ip": "IP",
+      "location": "Localisation",
+      "duration": "Durée",
+      "portal": "Portail",
+      "terminate": "Terminer",
+      "confirmTerminate": "Terminer cette session utilisateur ?"
+    },
+    "alerts": {
+      "title": "Alertes de sécurité",
+      "empty": "Aucune alerte pour le moment.",
+      "unresolvedOnly": "Non résolues uniquement",
+      "markResolved": "Marquer résolue",
+      "reopen": "Réouvrir",
+      "severity": {
+        "all": "Toutes",
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "critical": "Critique"
+      },
+      "type": {
+        "failed_auth": "Échec d'auth.",
+        "suspicious_access": "Accès suspect",
+        "admin_action": "Action admin",
+        "app_error": "Erreur app",
+        "bulk_export": "Export massif",
+        "new_device": "Nouvel appareil",
+        "session_expired": "Session expirée",
+        "role_change": "Changement de rôle"
+      }
+    },
+    "apps": {
+      "title": "Matrice de santé des applications",
+      "empty": "Aucune application enregistrée.",
+      "activeUsers": "Utilisateurs actifs",
+      "errors24h": "Erreurs (24h)",
+      "errorRate": "Taux d'erreur",
+      "neverScanned": "Jamais scannée",
+      "scanNow": "Scanner",
+      "scanning": "Scan en cours…",
+      "status": {
+        "protected": "Protégée",
+        "public": "Publique",
+        "misconfigured": "Mal configurée",
+        "unknown": "Inconnue"
+      }
+    },
+    "compliance": {
+      "title": "Conformité CSSF",
+      "subtitle": "Indicateurs réglementaires sur 30 jours.",
+      "mfaAdoption": "Adoption MFA",
+      "sessionCompliance": "Conformité des sessions",
+      "avgSession": "Durée moyenne",
+      "sessions": "sessions",
+      "accessReviews": "Revues d'accès utilisateurs",
+      "overdue": "en retard",
+      "auditCoverage": "Couverture audit",
+      "generateReport": "Générer rapport"
+    }
   },
   "landing": {
     "heroTitle1": "Vos applications,",

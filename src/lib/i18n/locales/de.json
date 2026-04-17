@@ -108,7 +108,84 @@
     "clientManagement": "Kundenverwaltung",
     "authLogs": "Auth Logs",
     "analytics": "Analytik",
+    "securityDashboard": "Sicherheits-Dashboard",
     "myDocuments": "Meine Dokumente"
+  },
+  "security": {
+    "page": {
+      "title": "Sicherheits-Dashboard",
+      "subtitle": "Echtzeit-Überwachung, Sicherheitswarnungen und CSSF-Compliance."
+    },
+    "kpi": {
+      "activeSessions": "Aktive Sitzungen",
+      "failedLogins24h": "Fehlgeschlagene Anmeldungen (24h)",
+      "suspicious": "Verdächtige Aktivitäten",
+      "compliance": "Compliance-Wert"
+    },
+    "sessions": {
+      "title": "Live-Sitzungen",
+      "empty": "Keine aktiven Sitzungen.",
+      "user": "Benutzer",
+      "app": "Anwendung",
+      "ip": "IP",
+      "location": "Standort",
+      "duration": "Dauer",
+      "portal": "Portal",
+      "terminate": "Beenden",
+      "confirmTerminate": "Diese Benutzersitzung beenden?"
+    },
+    "alerts": {
+      "title": "Sicherheitswarnungen",
+      "empty": "Derzeit keine Warnungen.",
+      "unresolvedOnly": "Nur ungelöste",
+      "markResolved": "Als gelöst markieren",
+      "reopen": "Erneut öffnen",
+      "severity": {
+        "all": "Alle",
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch"
+      },
+      "type": {
+        "failed_auth": "Auth fehlgeschlagen",
+        "suspicious_access": "Verdächtiger Zugriff",
+        "admin_action": "Admin-Aktion",
+        "app_error": "App-Fehler",
+        "bulk_export": "Massenexport",
+        "new_device": "Neues Gerät",
+        "session_expired": "Sitzung abgelaufen",
+        "role_change": "Rollenänderung"
+      }
+    },
+    "apps": {
+      "title": "App-Sicherheitsmatrix",
+      "empty": "Keine Anwendungen registriert.",
+      "activeUsers": "Aktive Benutzer",
+      "errors24h": "Fehler (24h)",
+      "errorRate": "Fehlerrate",
+      "neverScanned": "Nie gescannt",
+      "scanNow": "Jetzt scannen",
+      "scanning": "Scan läuft…",
+      "status": {
+        "protected": "Geschützt",
+        "public": "Öffentlich",
+        "misconfigured": "Fehlkonfiguriert",
+        "unknown": "Unbekannt"
+      }
+    },
+    "compliance": {
+      "title": "CSSF-Compliance",
+      "subtitle": "Regulatorische Kennzahlen über 30 Tage.",
+      "mfaAdoption": "MFA-Einführung",
+      "sessionCompliance": "Sitzungs-Compliance",
+      "avgSession": "Durchschnittliche Dauer",
+      "sessions": "Sitzungen",
+      "accessReviews": "Zugriffsüberprüfungen",
+      "overdue": "überfällig",
+      "auditCoverage": "Audit-Abdeckung",
+      "generateReport": "Bericht erstellen"
+    }
   },
   "landing": {
     "heroTitle1": "Ihre Anwendungen,",
