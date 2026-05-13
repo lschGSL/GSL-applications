@@ -108,7 +108,9 @@
     "clientManagement": "Client Management",
     "authLogs": "Auth Logs",
     "analytics": "Analytics",
-    "myDocuments": "My Documents"
+    "myDocuments": "My Documents",
+    "procedures": "Procedures",
+    "adminProcedures": "Procedures"
   },
   "landing": {
     "heroTitle1": "Your applications,",

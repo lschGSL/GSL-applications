@@ -14,6 +14,7 @@ import {
   ShieldAlert,
   FileText,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -22,6 +23,7 @@ import type { Profile } from "@/types/database";
 const navigation = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
   { key: "nav.applications", href: "/apps", icon: LayoutGrid },
+  { key: "nav.procedures", href: "/procedures", icon: BookOpen },
   { key: "nav.security", href: "/settings/security", icon: ShieldCheck },
 ];
 
@@ -29,6 +31,7 @@ const adminNavigation = [
   { key: "nav.userManagement", href: "/admin/users", icon: Users },
   { key: "nav.clientManagement", href: "/admin/clients", icon: Users2 },
   { key: "nav.appManagement", href: "/admin/apps", icon: Shield },
+  { key: "nav.adminProcedures", href: "/admin/procedures", icon: FileText },
   { key: "nav.auditLog", href: "/admin/audit-log", icon: ScrollText },
   { key: "nav.authLogs", href: "/admin/auth-logs", icon: ShieldAlert },
   { key: "nav.analytics", href: "/admin/analytics", icon: BarChart3 },
