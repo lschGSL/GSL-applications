@@ -103,13 +103,14 @@
     "security": "Security",
     "userManagement": "User Management",
     "appManagement": "App Management",
-    "procedures": "Procedures",
     "auditLog": "Audit Log",
     "settings": "Settings",
     "clientManagement": "Client Management",
     "authLogs": "Auth Logs",
     "analytics": "Analytics",
-    "myDocuments": "My Documents"
+    "myDocuments": "My Documents",
+    "procedures": "Procedures",
+    "adminProcedures": "Procedures"
   },
   "landing": {
     "heroTitle1": "Your applications,",
