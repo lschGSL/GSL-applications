@@ -6,7 +6,9 @@ import { getProfile } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProceduresTable } from "@/components/admin/procedures-table";
+import { ProcedureCategoriesManager } from "@/components/admin/procedure-categories-manager";
 import type { Procedure } from "@/types/procedures";
+import type { ProcedureCategory } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -18,12 +20,24 @@ export default async function AdminProceduresPage() {
   }
 
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("procedures")
-    .select("*")
-    .order("number", { ascending: true });
+  const [proceduresResult, categoriesResult] = await Promise.all([
+    supabase.from("procedures").select("*").order("number", { ascending: true }),
+    supabase
+      .from("procedure_categories")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+  ]);
 
-  const procedures = (data ?? []) as Procedure[];
+  const procedures = (proceduresResult.data ?? []) as Procedure[];
+  const categories = (categoriesResult.data ?? []) as ProcedureCategory[];
+
+  // Nombre de procédures rattachées à chaque catégorie (colonne category_id).
+  const countByCategory: Record<string, number> = {};
+  for (const p of (proceduresResult.data ?? []) as { category_id: string | null }[]) {
+    if (p.category_id) {
+      countByCategory[p.category_id] = (countByCategory[p.category_id] ?? 0) + 1;
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -46,6 +60,11 @@ export default async function AdminProceduresPage() {
       </div>
 
       <ProceduresTable procedures={procedures} />
+
+      <ProcedureCategoriesManager
+        initialCategories={categories}
+        countByCategory={countByCategory}
+      />
     </div>
   );
 }
