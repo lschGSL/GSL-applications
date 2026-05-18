@@ -147,6 +147,41 @@ export interface DocumentSignature {
   signer_email?: string;
 }
 
+export type ProcedureStatus = "draft" | "published" | "archived";
+
+export interface ProcedureCategory {
+  id: string;
+  slug: string;
+  name: string;
+  icon: string | null;
+  sort_order: number;
+  published: boolean;
+  placeholder: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined
+  procedure_count?: number;
+}
+
+export interface Procedure {
+  id: string;
+  number: string;
+  slug: string;
+  title: string;
+  /** Legacy free-text category — conservée pour compatibilité ascendante. */
+  category: string;
+  /** FK vers procedure_categories — nouvelle taxonomie. */
+  category_id: string | null;
+  summary: string | null;
+  content: string;
+  version: string;
+  owner: string | null;
+  status: ProcedureStatus;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export type SignatureRequestStatus = "pending" | "signed" | "declined";
 
 export interface SignatureRequest {

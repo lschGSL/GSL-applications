@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   FileText,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import type { Profile } from "@/types/database";
 
@@ -30,6 +31,7 @@ const adminNavigation = [
   { key: "nav.userManagement", href: "/admin/users", icon: Users },
   { key: "nav.clientManagement", href: "/admin/clients", icon: Users2 },
   { key: "nav.appManagement", href: "/admin/apps", icon: Shield },
+  { key: "nav.procedures", href: "/admin/procedures", icon: BookOpen },
   { key: "nav.auditLog", href: "/admin/audit-log", icon: ScrollText },
   { key: "nav.authLogs", href: "/admin/auth-logs", icon: ShieldAlert },
   { key: "nav.analytics", href: "/admin/analytics", icon: BarChart3 },
