@@ -18,6 +18,8 @@ import {
   FileText,
   BarChart3,
   BookOpen,
+  Scale,
+  GraduationCap,
 } from "lucide-react";
 import type { Profile } from "@/types/database";
 
@@ -25,6 +27,8 @@ const navigation = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
   { key: "nav.applications", href: "/apps", icon: LayoutGrid },
   { key: "nav.procedures", href: "/procedures", icon: BookOpen },
+  { key: "nav.decisions", href: "/decisions", icon: Scale },
+  { key: "nav.formations", href: "/formations", icon: GraduationCap },
   { key: "nav.security", href: "/settings/security", icon: ShieldCheck },
 ];
 

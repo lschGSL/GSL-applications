@@ -15,6 +15,8 @@ import {
   FileText,
   BarChart3,
   BookOpen,
+  Scale,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -24,6 +26,8 @@ const navigation = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
   { key: "nav.applications", href: "/apps", icon: LayoutGrid },
   { key: "nav.procedures", href: "/procedures", icon: BookOpen },
+  { key: "nav.decisions", href: "/decisions", icon: Scale },
+  { key: "nav.formations", href: "/formations", icon: GraduationCap },
   { key: "nav.security", href: "/settings/security", icon: ShieldCheck },
 ];
 
