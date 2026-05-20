@@ -147,6 +147,33 @@ export interface DocumentSignature {
   signer_email?: string;
 }
 
+export type DomainColor =
+  | "blue"
+  | "green"
+  | "amber"
+  | "purple"
+  | "teal"
+  | "coral"
+  | "pink"
+  | "gray";
+
+export interface Domain {
+  id: string;
+  name: string;
+  slug: string;
+  color: DomainColor;
+  icon: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  // Aggregated counts (set by GET /api/domains and GET /api/admin/domains)
+  procedure_count?: number;
+  decision_count?: number;
+  formation_count?: number;
+  total_count?: number;
+}
+
 export type ProcedureStatus = "draft" | "published" | "archived";
 
 export interface ProcedureCategory {
