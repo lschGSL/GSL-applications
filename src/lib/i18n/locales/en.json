@@ -444,5 +444,12 @@
   "security": {
     "title": "Security",
     "subtitle": "Manage your account security settings."
+  },
+  "domains": {
+    "filter": {
+      "all": "All",
+      "label": "Domain",
+      "ariaLabel": "Filter by domain"
+    }
   }
 }
