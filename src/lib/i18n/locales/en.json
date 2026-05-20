@@ -450,6 +450,12 @@
       "all": "All",
       "label": "Domain",
       "ariaLabel": "Filter by domain"
-    }
+    },
+    "view": {
+      "list": "List",
+      "grouped": "By domain",
+      "ariaLabel": "View mode"
+    },
+    "unassigned": "Unassigned"
   }
 }

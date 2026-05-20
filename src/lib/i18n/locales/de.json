@@ -450,6 +450,12 @@
       "all": "Alle",
       "label": "Bereich",
       "ariaLabel": "Nach Bereich filtern"
-    }
+    },
+    "view": {
+      "list": "Liste",
+      "grouped": "Nach Bereich",
+      "ariaLabel": "Ansichtsmodus"
+    },
+    "unassigned": "Ohne Bereich"
   }
 }

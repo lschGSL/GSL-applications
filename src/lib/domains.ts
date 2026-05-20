@@ -61,3 +61,43 @@ export async function withDomainCounts(
     };
   });
 }
+
+export interface DomainGroup<T> {
+  domain: Domain | null;
+  items: T[];
+}
+
+/**
+ * Regroupe une liste d'items (procedures/decisions/formations) par domaine.
+ * Les items sans domain_id vont dans un groupe `{ domain: null, ... }` placé en fin.
+ * L'ordre des groupes suit l'ordre de `domains` (donc sort_order).
+ */
+export function groupByDomain<T extends { domain_id: string | null }>(
+  items: T[],
+  domains: Domain[],
+): DomainGroup<T>[] {
+  const byId = new Map<string, T[]>();
+  const orphans: T[] = [];
+
+  for (const item of items) {
+    if (item.domain_id && domains.some((d) => d.id === item.domain_id)) {
+      const arr = byId.get(item.domain_id) ?? [];
+      arr.push(item);
+      byId.set(item.domain_id, arr);
+    } else {
+      orphans.push(item);
+    }
+  }
+
+  const groups: DomainGroup<T>[] = [];
+  for (const d of domains) {
+    const arr = byId.get(d.id);
+    if (arr && arr.length > 0) {
+      groups.push({ domain: d, items: arr });
+    }
+  }
+  if (orphans.length > 0) {
+    groups.push({ domain: null, items: orphans });
+  }
+  return groups;
+}
