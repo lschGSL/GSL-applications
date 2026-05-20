@@ -43,4 +43,6 @@ export interface Procedure {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  domain_id: string | null;
+  tags: string[];
 }

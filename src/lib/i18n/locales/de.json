@@ -112,7 +112,8 @@
     "procedures": "Verfahren",
     "decisions": "Entscheidungen",
     "formations": "Schulungen",
-    "adminProcedures": "Verfahren"
+    "adminProcedures": "Verfahren",
+    "adminDomains": "Bereiche"
   },
   "landing": {
     "heroTitle1": "Ihre Anwendungen,",
@@ -444,5 +445,18 @@
   "security": {
     "title": "Sicherheit",
     "subtitle": "Verwalten Sie die Sicherheitseinstellungen Ihres Kontos."
+  },
+  "domains": {
+    "filter": {
+      "all": "Alle",
+      "label": "Bereich",
+      "ariaLabel": "Nach Bereich filtern"
+    },
+    "view": {
+      "list": "Liste",
+      "grouped": "Nach Bereich",
+      "ariaLabel": "Ansichtsmodus"
+    },
+    "unassigned": "Ohne Bereich"
   }
 }

@@ -7,4 +7,6 @@ export interface Formation {
   content: string;
   created_at: string;
   updated_at: string;
+  domain_id: string | null;
+  tags: string[];
 }

@@ -112,7 +112,8 @@
     "procedures": "Procédures",
     "decisions": "Décisions",
     "formations": "Formations",
-    "adminProcedures": "Procédures"
+    "adminProcedures": "Procédures",
+    "adminDomains": "Domaines"
   },
   "landing": {
     "heroTitle1": "Vos applications,",
@@ -444,5 +445,18 @@
   "security": {
     "title": "Sécurité",
     "subtitle": "Gérez les paramètres de sécurité de votre compte."
+  },
+  "domains": {
+    "filter": {
+      "all": "Tous",
+      "label": "Domaine",
+      "ariaLabel": "Filtrer par domaine"
+    },
+    "view": {
+      "list": "Liste",
+      "grouped": "Par domaine",
+      "ariaLabel": "Mode d'affichage"
+    },
+    "unassigned": "Sans domaine"
   }
 }

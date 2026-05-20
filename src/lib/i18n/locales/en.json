@@ -112,7 +112,8 @@
     "procedures": "Procedures",
     "decisions": "Decisions",
     "formations": "Training",
-    "adminProcedures": "Procedures"
+    "adminProcedures": "Procedures",
+    "adminDomains": "Domains"
   },
   "landing": {
     "heroTitle1": "Your applications,",
@@ -444,5 +445,18 @@
   "security": {
     "title": "Security",
     "subtitle": "Manage your account security settings."
+  },
+  "domains": {
+    "filter": {
+      "all": "All",
+      "label": "Domain",
+      "ariaLabel": "Filter by domain"
+    },
+    "view": {
+      "list": "List",
+      "grouped": "By domain",
+      "ariaLabel": "View mode"
+    },
+    "unassigned": "Unassigned"
   }
 }
