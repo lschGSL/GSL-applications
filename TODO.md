@@ -155,6 +155,7 @@
 | 009 | Signature requests (multi-signataires) | ✅ |
 | 010 | Seed Bank Extractor + grant all users | ✅ |
 | 011 | Seed Agent Fiscal + grant all users | ✅ |
+| 20260520 | Taxonomie `domains` + `domain_id`/`tags[]` sur procedures/decisions/formations + mapping conservateur (sprint domains-filtering, Phase 1) | ✅ |
 
 ---
 

@@ -242,6 +242,22 @@ documents (
   created_at  timestamptz,
   updated_at  timestamptz
 )
+
+-- Taxonomie transversale (sprint domains-filtering, migration 20260520)
+domains (
+  id          uuid PRIMARY KEY,
+  name        text UNIQUE NOT NULL,
+  slug        text UNIQUE NOT NULL,
+  color       text NOT NULL DEFAULT 'gray',     -- blue|green|amber|purple|teal|coral|pink|gray
+  icon        text,
+  sort_order  integer NOT NULL DEFAULT 0,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz,
+  updated_at  timestamptz
+)
+-- + colonnes ajoutées sur procedures / decisions / formations :
+--   domain_id uuid REFERENCES domains(id) ON DELETE SET NULL
+--   tags      text[] NOT NULL DEFAULT '{}'
 ```
 
 ### 4.2 Row-Level Security (RLS)
@@ -254,6 +270,7 @@ Toutes les tables ont RLS active :
 - **invitations** : gestion admin/manager, lecture par token pour validation
 - **document_folders** : clients voient leurs dossiers, admins/managers voient tout
 - **documents** : clients voient leurs docs, admins/managers voient tout, clients peuvent modifier leurs docs en statut `pending`
+- **domains** : lecture pour tous les `authenticated`, ecriture admin uniquement
 
 ### 4.3 Fonctions helper
 
@@ -468,6 +485,58 @@ Admin cree une demande pour le client
 | `salaires` | Fiches de paie / Payroll |
 | `general` | Documents generaux |
 | `other` | Autre |
+
+---
+
+## 10bis. Taxonomie `domains` (sprint domains-filtering)
+
+Taxonomie transversale partagee par les pages `/procedures`, `/decisions` et
+`/formations`. Une seule source de verite, des chips filtrantes communes, un
+groupement optionnel par domaine.
+
+### Modele de donnees
+
+- Table `domains` (cf. section 4.1) : `name`, `slug` (uniques), `color` (whitelist
+  de 8 couleurs), `icon`, `sort_order`, `is_active`.
+- Chaque table metier (`procedures`, `decisions`, `formations`) porte deux
+  colonnes : `domain_id uuid NULL` (FK vers `domains`, `ON DELETE SET NULL`) et
+  `tags text[]`.
+- Les colonnes legacy `procedures.category` (free-text) et
+  `procedures.category_id` (FK vers `procedure_categories`) sont conservees
+  pour rollback ; suppression differee.
+
+### API
+
+| Route | Methode | Description |
+|-------|---------|-------------|
+| `/api/domains` | GET | Liste publique (auth) des domaines actifs, avec counts par type (`procedure_count`, `decision_count`, `formation_count`, `total_count`). Les counts respectent la RLS du caller. |
+| `/api/admin/domains` | GET, POST | Liste complete + counts (admin) ; creation. |
+| `/api/admin/domains/[id]` | PATCH, DELETE | Edition partielle ; suppression bloquee si elements rattaches (utiliser PATCH `{ is_active: false }` pour archiver). |
+
+Toutes les ecritures admin tracent un `audit_logs` (`resource_type = "domain"`).
+
+### UI
+
+- `DomainBadge` (`src/components/domains/domain-badge.tsx`) : pill statique
+  coloree d'apres `domain.color`.
+- `DomainFilterBar` (`src/components/domains/domain-filter-bar.tsx`) : chips
+  filtrantes "use client", synchronisees via URL param `?domain=<slug>`,
+  count contextuel choisi via prop `countField`.
+- `ViewToggle` (`src/components/domains/view-toggle.tsx`) : bascule
+  list/grouped via URL param `?view=grouped`.
+- Page admin `/admin/domains` (`DomainsManager`) : CRUD inline + archivage +
+  reordonnancement up/down (swap `sort_order` entre voisins en deux PATCH
+  paralleles).
+
+### Helper serveur
+
+`src/lib/domains.ts` expose :
+- `DOMAIN_COLORS`, `isDomainColor()` pour la validation.
+- `withDomainCounts(supabase, domains)` qui attache les counts en 3 requetes
+  paralleles (procedures/decisions/formations) et compte cote Node.
+- `groupByDomain(items, domains)` qui rend `[{ domain, items }, ...]`
+  ordonne par `sort_order`, avec un groupe orphelin `{ domain: null, ... }`
+  en fin pour les items sans `domain_id`.
 
 ---
 

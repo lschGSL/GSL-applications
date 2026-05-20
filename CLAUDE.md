@@ -123,6 +123,7 @@ src/
 - `document_requests` — Document request workflow (GSL → client)
 - `document_signatures` — Electronic signatures (hash, method, IP, user-agent)
 - `signature_requests` — Multi-signer signature requests (document → signer mapping)
+- `domains` — Taxonomie transversale partagée par `procedures`, `decisions`, `formations` (sprint domains-filtering). Colonnes `domain_id` + `tags[]` ajoutées sur ces 3 tables.
 - `extraction_jobs` — Bank Extractor jobs (added by Bank Extractor, shared Supabase)
 
 ## Integrated Applications
@@ -198,6 +199,7 @@ Optional:
 | `009_signature_requests.sql` | Multi-signer signature requests |
 | `010_seed_bank_extractor.sql` | Register Bank Extractor app + grant access to all users |
 | `011_seed_agent_fiscal.sql` | Register Agent Fiscal app + grant access to all users |
+| `20260520_domains.sql` | Taxonomie `domains` (6 seeds : Odoo / RH / IT-Dev / Sécurité / Agent Fiscal / Audit) + `domain_id` + `tags[]` sur procedures / decisions / formations + mapping conservateur depuis les catégories existantes |
 
 ## Roadmap
 
@@ -270,6 +272,23 @@ Contexte metier : fiduciaire/revision au Luxembourg (GSL Fiduciaire + GSL Revisi
 - **Q1 2027** → Phase 4 (Ops & monitoring) ✅
 - **Q1 2027** → Phase 5 (Integration apps) ✅
 - **A venir** → Audit trail client, LuxTrust integration
+
+### Sprint domains-filtering (Q2 2026) ✅ DONE
+
+Taxonomie transversale `domains` partagée par procedures / decisions / formations,
+avec filtrage et groupement par domaine côté portail, et gestion admin complète.
+
+| Phase | Contenu | Statut |
+|-------|---------|--------|
+| 1 | Migration SQL `20260520_domains.sql` (table + 6 seeds + `domain_id`/`tags[]` sur 3 tables + mapping conservateur) | ✅ Done |
+| 2 | API routes : `GET /api/domains` (public, avec counts) + CRUD admin `/api/admin/domains[/:id]` | ✅ Done |
+| 3 | Composants `DomainBadge` + `DomainFilterBar` (chips colorées, counts, URL params `?domain=<slug>`) + `ViewToggle` (URL param `?view=grouped`) | ✅ Done |
+| 4 | Intégration filtrage + groupement + DomainBadge dans `/procedures`, `/decisions`, `/formations` | ✅ Done |
+| 5 | Page admin `/admin/domains` : CRUD inline, archivage (`is_active`), réordonnancement up/down (swap `sort_order`) | ✅ Done |
+| 6 | i18n (clés `domains.*` + `nav.adminDomains` en fr/en/de) + mise à jour CLAUDE.md / ARCHITECTURE.md / TODO.md + PR | ✅ Done |
+
+Colonnes legacy `category` (procedures) et `category_id` (procedures) sont préservées
+pour rollback ; leur suppression est différée à un sprint ultérieur.
 
 - ## Skills & Resources
 
