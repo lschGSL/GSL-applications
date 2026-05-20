@@ -20,6 +20,7 @@ import {
   BookOpen,
   Scale,
   GraduationCap,
+  Tag,
 } from "lucide-react";
 import type { Profile } from "@/types/database";
 
@@ -37,6 +38,7 @@ const adminNavigation = [
   { key: "nav.clientManagement", href: "/admin/clients", icon: Users2 },
   { key: "nav.appManagement", href: "/admin/apps", icon: Shield },
   { key: "nav.adminProcedures", href: "/admin/procedures", icon: FileText },
+  { key: "nav.adminDomains", href: "/admin/domains", icon: Tag },
   { key: "nav.auditLog", href: "/admin/audit-log", icon: ScrollText },
   { key: "nav.authLogs", href: "/admin/auth-logs", icon: ShieldAlert },
   { key: "nav.analytics", href: "/admin/analytics", icon: BarChart3 },

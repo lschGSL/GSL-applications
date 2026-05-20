@@ -112,7 +112,8 @@
     "procedures": "Procédures",
     "decisions": "Décisions",
     "formations": "Formations",
-    "adminProcedures": "Procédures"
+    "adminProcedures": "Procédures",
+    "adminDomains": "Domaines"
   },
   "landing": {
     "heroTitle1": "Vos applications,",
