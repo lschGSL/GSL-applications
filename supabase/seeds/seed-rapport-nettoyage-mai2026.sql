@@ -358,3 +358,5 @@ ON CONFLICT (slug) DO UPDATE SET
 
 -- Retry: 21/05/2026 v2
 
+
+-- Retry Python v1
