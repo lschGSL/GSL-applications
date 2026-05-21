@@ -353,3 +353,5 @@ WHERE pc.slug = 'odoo-donnees'
 ON CONFLICT (slug) DO UPDATE SET
   content = EXCLUDED.content,
   updated_at = NOW();
+
+-- Executed: 21/05/2026
