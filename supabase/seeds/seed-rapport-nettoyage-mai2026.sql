@@ -355,3 +355,5 @@ ON CONFLICT (slug) DO UPDATE SET
   updated_at = NOW();
 
 -- Executed: 21/05/2026
+
+-- Retry: 21/05/2026 v2
