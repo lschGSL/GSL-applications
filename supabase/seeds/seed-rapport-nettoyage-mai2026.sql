@@ -360,3 +360,5 @@ ON CONFLICT (slug) DO UPDATE SET
 
 
 -- Retry Python v1
+
+-- Retry pooler v1
