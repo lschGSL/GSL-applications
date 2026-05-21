@@ -1,0 +1,52 @@
+﻿name: Execute Supabase Seeds
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/seeds/**.sql'
+      - 'supabase/seed/**.sql'
+
+jobs:
+  execute-seeds:
+    runs-on: ubuntu-latest
+    name: Execute new SQL seeds in Supabase
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed seed files
+        id: changed-files
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'supabase/seeds/*.sql' 'supabase/seed/*.sql' | tr '\n' ' ')
+          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+          echo "Changed seed files: $CHANGED"
+
+      - name: Install PostgreSQL client
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+
+      - name: Execute seed files via psql
+        if: steps.changed-files.outputs.files != ''
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [ -f "$file" ]; then
+              echo "Executing: $file"
+              psql "postgresql://postgres@db.kwjgfljzdgpfyqknakmy.supabase.co:5432/postgres" \
+                -f "$file" \
+                -v ON_ERROR_STOP=1
+              echo "Done: $file"
+            fi
+          done
+
+      - name: No seed files changed
+        if: steps.changed-files.outputs.files == ''
+        run: echo "No seed files changed — nothing to execute."
