@@ -74,7 +74,7 @@ export default async function UsersPage({
   // Fetch ALL auth users to find orphans and pending
   const pendingUserIds = new Set<string>();
   const orphanUserIds = new Set<string>();
-  const profileIds = new Set((profilesData ?? []).map((p) => p.id));
+  const profilesById = new Map((profilesData ?? []).map((p) => [p.id, p]));
 
   const { data: authUsers } = await serviceClient.auth.admin.listUsers();
 
@@ -82,11 +82,13 @@ export default async function UsersPage({
 
   if (authUsers?.users) {
     for (const u of authUsers.users) {
-      if (!u.email_confirmed_at) {
+      const existingProfile = profilesById.get(u.id);
+      // Pending: unconfirmed email AND (no profile yet OR profile deactivated)
+      if (!u.email_confirmed_at && (!existingProfile || !existingProfile.is_active)) {
         pendingUserIds.add(u.id);
       }
       // Orphaned: exists in auth but not in profiles
-      if (!profileIds.has(u.id)) {
+      if (!existingProfile) {
         orphanUserIds.add(u.id);
         const meta = (u.user_metadata || {}) as Record<string, unknown>;
         orphanProfiles.push({
@@ -104,8 +106,40 @@ export default async function UsersPage({
     }
   }
 
-  // Merge profiles + orphans
-  const allUsers = [...(profilesData ?? []), ...orphanProfiles];
+  // Pending invitations live in the custom `invitations` table: invited users
+  // have NO auth.users row until they accept and register, so they would never
+  // show up via listUsers() above. Surface them here as pending entries.
+  const { data: invitationsData } = await supabase
+    .from("invitations")
+    .select("id, email, role, entity, created_at")
+    .is("accepted_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+
+  const knownEmails = new Set(
+    [...(profilesData ?? []), ...orphanProfiles].map((u) => u.email.toLowerCase())
+  );
+
+  const invitationProfiles: Profile[] = [];
+  for (const inv of invitationsData ?? []) {
+    // Skip if the invitee already has a profile/auth account with that email.
+    if (knownEmails.has(inv.email.toLowerCase())) continue;
+    pendingUserIds.add(inv.id);
+    invitationProfiles.push({
+      id: inv.id,
+      email: inv.email,
+      full_name: null,
+      avatar_url: null,
+      role: inv.role || "member",
+      entity: inv.entity || null,
+      is_active: false,
+      created_at: inv.created_at,
+      updated_at: inv.created_at,
+    } as Profile);
+  }
+
+  // Merge: pending invitations first (newest action), then profiles + auth orphans.
+  const allUsers = [...invitationProfiles, ...(profilesData ?? []), ...orphanProfiles];
 
   // Text search
   let users = query
@@ -138,7 +172,7 @@ export default async function UsersPage({
     } else if (statusFilter === "active") {
       users = users.filter((u) => u.is_active && !pendingUserIds.has(u.id));
     } else {
-      users = users.filter((u) => !u.is_active);
+      users = users.filter((u) => !u.is_active && !pendingUserIds.has(u.id));
     }
   }
 
