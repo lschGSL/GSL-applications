@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const { t } = useI18n();
 
@@ -40,10 +41,15 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
       }
 
       setSuccess(true);
+      // Refresh the underlying list so the new pending invitation appears,
+      // without navigating away (the dialog stays open).
+      router.refresh();
+      // Keep the success message for 2s, then reset the form so the admin can
+      // send another invitation without closing the dialog.
       setTimeout(() => {
-        router.push("/admin/users");
-        router.refresh();
-      }, 1500);
+        formRef.current?.reset();
+        setSuccess(false);
+      }, 2000);
     } catch {
       setError(t("common.networkError"));
     } finally {
@@ -81,7 +87,7 @@ export function InviteUserDialog({ showDialog }: { showDialog: boolean }) {
                   {t("admin.users.inviteSent")}
                 </div>
               )}
-              <form action={handleSubmit} className="space-y-4">
+              <form ref={formRef} action={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="invite-email" className="text-sm font-medium">{t("auth.email")} *</label>
                   <Input id="invite-email" name="email" type="email" placeholder="jean@gsl.lu" required />
