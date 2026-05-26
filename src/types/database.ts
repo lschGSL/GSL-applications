@@ -64,7 +64,12 @@ export interface Invitation {
   email: string;
   role: UserRole;
   entity: GslEntity | null;
-  token: string;
+  // SHA-256 digest of the clear token. The clear value is never persisted —
+  // it lives only in the invitation email URL.
+  token_hash: string;
+  // Legacy clear-text column kept temporarily for rollback safety; ignored
+  // by the application.
+  token?: string | null;
   invited_by: string | null;
   accepted_at: string | null;
   expires_at: string;

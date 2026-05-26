@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 
@@ -9,11 +10,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Token is required" }, { status: 400 });
   }
 
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
   const supabase = await createServiceClient();
   const { data: invitation } = await supabase
     .from("invitations")
     .select("id, email, role, entity, expires_at, accepted_at")
-    .eq("token", token)
+    .eq("token_hash", tokenHash)
     .single();
 
   if (!invitation) {

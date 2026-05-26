@@ -1,7 +1,12 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { sendInvitationEmail } from "@/lib/email/resend";
+
+function sha256Hex(value: string): string {
+  return crypto.createHash("sha256").update(value).digest("hex");
+}
 
 // Create an invitation
 export async function POST(request: NextRequest) {
@@ -53,6 +58,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "A pending invitation already exists for this email" }, { status: 400 });
   }
 
+  // Generate the clear token in JS, persist only the SHA-256 digest.
+  // The clear value never round-trips through the database.
+  const clearToken = crypto.randomBytes(32).toString("hex");
+  const tokenHash = sha256Hex(clearToken);
+
   const { data, error } = await supabase
     .from("invitations")
     .insert({
@@ -60,8 +70,9 @@ export async function POST(request: NextRequest) {
       role: role || "member",
       entity: entity || null,
       invited_by: user.id,
+      token_hash: tokenHash,
     })
-    .select()
+    .select("id, email, role, entity, invited_by, accepted_at, expires_at, created_at")
     .single();
 
   if (error) {
@@ -80,11 +91,12 @@ export async function POST(request: NextRequest) {
     user_agent: headersList.get("user-agent"),
   });
 
-  // Send invitation email
+  // Send invitation email — the clear token lives only in the URL here
+  // and in the user's inbox.
   const host = headersList.get("host") || "localhost:3000";
   const proto = headersList.get("x-forwarded-proto") || "http";
   const portalUrl = `${proto}://${host}`;
-  const signupUrl = `${portalUrl}/register?invite=${data.token}`;
+  const signupUrl = `${portalUrl}/register?invite=${clearToken}`;
 
   sendInvitationEmail({
     email,

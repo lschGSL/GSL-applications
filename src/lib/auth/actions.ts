@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "node:crypto";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -101,10 +102,14 @@ export async function signUp(formData: FormData) {
   let inviteData: { id: string; role: string; entity: string | null } | null = null;
   if (inviteToken) {
     const serviceClient = await createServiceClient();
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(inviteToken)
+      .digest("hex");
     const { data: invitation } = await serviceClient
       .from("invitations")
       .select("id, role, entity, email, expires_at, accepted_at")
-      .eq("token", inviteToken)
+      .eq("token_hash", tokenHash)
       .single();
 
     if (!invitation || invitation.accepted_at || new Date(invitation.expires_at) < new Date()) {
