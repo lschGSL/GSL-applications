@@ -124,6 +124,7 @@ export default async function DashboardPage() {
               return (
               <AppCard
                 key={access.app_id}
+                slug={app?.slug || ""}
                 name={app?.name || "Unknown"}
                 description={app?.description || "No description"}
                 url={app?.url || ""}

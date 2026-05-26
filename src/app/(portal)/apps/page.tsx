@@ -136,7 +136,7 @@ export default async function AppsPage({
                   {app.description || "No description available."}
                 </p>
                 {hasAccess ? (
-                  <OpenAppButton url={app.url} />
+                  <OpenAppButton slug={app.slug} url={app.url} />
                 ) : (
                   <RequestAccessButton appId={app.id} appName={app.name} />
                 )}
