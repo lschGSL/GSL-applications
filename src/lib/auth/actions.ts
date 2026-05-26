@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "node:crypto";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -12,7 +13,7 @@ export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
 
   // Rate limit: 5 attempts per IP per 15 minutes
-  const ipLimit = checkRateLimit(`signin:ip:${ip}`, 5, 15 * 60 * 1000);
+  const ipLimit = await checkRateLimit(`signin:ip:${ip}`, 5, 15 * 60 * 1000);
   if (!ipLimit.allowed) {
     return {
       error: `Too many login attempts. Please try again in ${ipLimit.retryAfterSeconds} seconds.`,
@@ -20,7 +21,7 @@ export async function signIn(formData: FormData) {
   }
 
   // Rate limit: 5 attempts per email per 15 minutes
-  const emailLimit = checkRateLimit(`signin:email:${email}`, 5, 15 * 60 * 1000);
+  const emailLimit = await checkRateLimit(`signin:email:${email}`, 5, 15 * 60 * 1000);
   if (!emailLimit.allowed) {
     return {
       error: `Too many login attempts for this account. Please try again in ${emailLimit.retryAfterSeconds} seconds.`,
@@ -83,7 +84,7 @@ export async function signUp(formData: FormData) {
   const ip = headersList.get("x-forwarded-for") || "unknown";
 
   // Rate limit: 3 sign-ups per IP per 15 minutes
-  const limit = checkRateLimit(`signup:ip:${ip}`, 3, 15 * 60 * 1000);
+  const limit = await checkRateLimit(`signup:ip:${ip}`, 3, 15 * 60 * 1000);
   if (!limit.allowed) {
     return {
       error: `Too many registration attempts. Please try again in ${limit.retryAfterSeconds} seconds.`,
@@ -101,10 +102,14 @@ export async function signUp(formData: FormData) {
   let inviteData: { id: string; role: string; entity: string | null } | null = null;
   if (inviteToken) {
     const serviceClient = await createServiceClient();
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(inviteToken)
+      .digest("hex");
     const { data: invitation } = await serviceClient
       .from("invitations")
       .select("id, role, entity, email, expires_at, accepted_at")
-      .eq("token", inviteToken)
+      .eq("token_hash", tokenHash)
       .single();
 
     if (!invitation || invitation.accepted_at || new Date(invitation.expires_at) < new Date()) {
@@ -189,7 +194,7 @@ export async function forgotPassword(formData: FormData) {
   const ip = headersList.get("x-forwarded-for") || "unknown";
 
   // Rate limit: 3 requests per IP per 15 minutes
-  const limit = checkRateLimit(`forgot:ip:${ip}`, 3, 15 * 60 * 1000);
+  const limit = await checkRateLimit(`forgot:ip:${ip}`, 3, 15 * 60 * 1000);
   if (!limit.allowed) {
     return {
       error: `Too many requests. Please try again in ${limit.retryAfterSeconds} seconds.`,
