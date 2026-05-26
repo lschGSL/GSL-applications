@@ -93,7 +93,9 @@
     "verify": "Bestätigen",
     "banner": "Sichern Sie Ihr Konto mit Zwei-Faktor-Authentifizierung",
     "bannerDesc": "Schützen Sie Ihr Konto durch Aktivierung von 2FA. Es dauert nur eine Minute und bietet zusätzliche Sicherheit.",
-    "setup": "2FA aktivieren"
+    "setup": "2FA aktivieren",
+    "requiredTitle": "Zwei-Faktor-Authentifizierung erforderlich",
+    "requiredDesc": "Die Zwei-Faktor-Authentifizierung (2FA) ist für Ihre Rolle obligatorisch. Bitte richten Sie unten Ihre Authentifizierungs-App ein, um weiterhin auf das Portal zugreifen zu können."
   },
   "nav": {
     "main": "Hauptmenü",

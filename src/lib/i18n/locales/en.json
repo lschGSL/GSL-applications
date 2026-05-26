@@ -93,7 +93,9 @@
     "verify": "Verify",
     "banner": "Secure your account with Two-Factor Authentication",
     "bannerDesc": "Protect your account by enabling 2FA. It only takes a minute and adds an extra layer of security.",
-    "setup": "Enable 2FA now"
+    "setup": "Enable 2FA now",
+    "requiredTitle": "Two-factor authentication required",
+    "requiredDesc": "Two-factor authentication (2FA) is mandatory for your role. Please configure your authenticator app below to keep accessing the portal."
   },
   "nav": {
     "main": "Main",

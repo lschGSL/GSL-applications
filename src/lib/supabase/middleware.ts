@@ -1,7 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/mfa-verify", "/welcome", "/auth/callback", "/auth/exchange", "/api/invitations"];
+const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/mfa-verify", "/welcome", "/auth/callback", "/auth/exchange"];
+
+// API routes that must remain public. Use exact match so that future
+// sibling routes under /api/invitations/* stay protected.
+const PUBLIC_API_PATHS = ["/api/invitations/validate"];
+
+const MFA_REQUIRED_ROLES = ["admin", "manager"] as const;
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -65,9 +71,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublicPath = publicPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const isPublicPath =
+    publicPaths.some((path) => request.nextUrl.pathname.startsWith(path)) ||
+    PUBLIC_API_PATHS.includes(request.nextUrl.pathname);
 
   // Redirect unauthenticated users to login (including /)
   if (!user && !isPublicPath) {
@@ -93,6 +99,43 @@ export async function updateSession(request: NextRequest) {
     url.pathname = "/dashboard";
     url.search = "";
     return NextResponse.redirect(url);
+  }
+
+  // Enforce MFA for sensitive roles (admin, manager).
+  // If they have no verified TOTP factor, force them through /settings/security
+  // before letting them access the rest of the portal.
+  if (user && !isPublicPath) {
+    const pathname = request.nextUrl.pathname;
+    const isMfaExempt =
+      pathname.startsWith("/api/") ||
+      pathname === "/settings" ||
+      pathname.startsWith("/settings/") ||
+      pathname.startsWith("/auth/exchange") ||
+      pathname.startsWith("/auth/callback") ||
+      pathname.startsWith("/mfa-verify");
+
+    if (!isMfaExempt) {
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      const role = profileRow?.role;
+      if (role && (MFA_REQUIRED_ROLES as readonly string[]).includes(role)) {
+        const { data: factorsData } = await supabase.auth.mfa.listFactors();
+        const hasVerifiedTotp =
+          factorsData?.totp?.some((f) => f.status === "verified") ?? false;
+
+        if (!hasVerifiedTotp) {
+          const url = request.nextUrl.clone();
+          url.pathname = "/settings/security";
+          url.search = "";
+          url.searchParams.set("mfa_required", "true");
+          return NextResponse.redirect(url);
+        }
+      }
+    }
   }
 
   return supabaseResponse;
