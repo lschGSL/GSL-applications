@@ -1,7 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/mfa-verify", "/welcome", "/auth/callback", "/auth/exchange", "/api/invitations"];
+const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/mfa-verify", "/welcome", "/auth/callback", "/auth/exchange"];
+
+// API routes that must remain public. Use exact match so that future
+// sibling routes under /api/invitations/* stay protected.
+const PUBLIC_API_PATHS = ["/api/invitations/validate"];
 
 const MFA_REQUIRED_ROLES = ["admin", "manager"] as const;
 
@@ -67,9 +71,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublicPath = publicPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const isPublicPath =
+    publicPaths.some((path) => request.nextUrl.pathname.startsWith(path)) ||
+    PUBLIC_API_PATHS.includes(request.nextUrl.pathname);
 
   // Redirect unauthenticated users to login (including /)
   if (!user && !isPublicPath) {
