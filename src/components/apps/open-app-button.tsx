@@ -1,31 +1,51 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { ExternalLink, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n/context";
 
-export function OpenAppButton({ url }: { url: string }) {
+export function OpenAppButton({ slug, url }: { slug: string; url: string }) {
   const fullUrl = url.startsWith("http") ? url : `https://${url}`;
   const { t } = useI18n();
+  const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
-    const supabase = createClient();
-    const { data: { session }, error } = await supabase.auth.getSession();
+    if (loading) return;
+    setLoading(true);
 
-    if (session) {
-      const authUrl = new URL("/auth/exchange", fullUrl);
-      authUrl.searchParams.set("access_token", session.access_token);
-      authUrl.searchParams.set("refresh_token", session.refresh_token);
-      window.open(authUrl.toString(), "_blank", "noopener,noreferrer");
-    } else {
+    try {
+      const response = await fetch("/api/auth/sso/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app_slug: slug }),
+      });
+
+      if (response.ok) {
+        const { redirect_url } = (await response.json()) as {
+          redirect_url: string;
+        };
+        window.open(redirect_url, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      // If SSO could not be initiated (no session, no access, etc.),
+      // fall back to opening the app directly — it will redirect to
+      // its own login.
       window.open(fullUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Button className="w-full" onClick={handleClick}>
-      {t("apps.openApplication")} <ExternalLink className="ml-2 h-4 w-4" />
+    <Button className="w-full" onClick={handleClick} disabled={loading}>
+      {t("apps.openApplication")}
+      {loading ? (
+        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+      ) : (
+        <ExternalLink className="ml-2 h-4 w-4" />
+      )}
     </Button>
   );
 }

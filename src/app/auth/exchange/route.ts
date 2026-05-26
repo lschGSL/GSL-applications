@@ -1,27 +1,40 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { consumeSsoCode } from "@/lib/sso/exchange";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
-  const accessToken = searchParams.get("access_token");
-  const refreshToken = searchParams.get("refresh_token");
 
-  console.log("[auth/exchange] hit - origin:", origin);
-  console.log("[auth/exchange] access_token present:", !!accessToken);
-  console.log("[auth/exchange] refresh_token present:", !!refreshToken);
+  // New flow: opaque one-time code, tokens fetched server-side.
+  // Legacy flow (still accepted for backwards compatibility): tokens
+  // passed verbatim in the URL.
+  const code = searchParams.get("code");
+  let accessToken: string | null;
+  let refreshToken: string | null;
+
+  if (code) {
+    const result = await consumeSsoCode(code);
+    if (!result.ok) {
+      return NextResponse.redirect(
+        `${origin}/login?message=Invalid or expired SSO code`
+      );
+    }
+    accessToken = result.access_token;
+    refreshToken = result.refresh_token;
+  } else {
+    accessToken = searchParams.get("access_token");
+    refreshToken = searchParams.get("refresh_token");
+  }
 
   if (!accessToken || !refreshToken) {
-    console.log("[auth/exchange] MISSING TOKENS - redirecting to login");
     return NextResponse.redirect(
       `${origin}/login?message=Missing authentication tokens`
     );
   }
 
-  // Create the redirect response FIRST so we can set cookies on it
   const redirectUrl = `${origin}/dashboard`;
   const response = NextResponse.redirect(redirectUrl);
 
-  // Create a Supabase client that writes cookies directly onto the redirect response
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -45,16 +58,10 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const { data, error } = await supabase.auth.setSession({
+  const { error } = await supabase.auth.setSession({
     access_token: accessToken,
     refresh_token: refreshToken,
   });
-
-  console.log(
-    "[auth/exchange] setSession result - user:",
-    data?.user?.email ?? "null"
-  );
-  console.log("[auth/exchange] setSession error:", error?.message ?? "none");
 
   if (error) {
     return NextResponse.redirect(
@@ -62,6 +69,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Return the response that carries the auth cookies
   return response;
 }

@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LayoutGrid, ExternalLink } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { LayoutGrid, ExternalLink, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n/context";
 
 export function AppCard({
+  slug,
   name,
   description,
   url,
   iconUrl,
 }: {
+  slug: string;
   name: string;
   description: string;
   url: string;
@@ -18,20 +20,32 @@ export function AppCard({
 }) {
   const fullUrl = url && url.trim() ? (url.startsWith("http") ? url : `https://${url}`) : "";
   const { t } = useI18n();
+  const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
-    if (!fullUrl) return;
+    if (!fullUrl || !slug || loading) return;
+    setLoading(true);
 
-    const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const response = await fetch("/api/auth/sso/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app_slug: slug }),
+      });
 
-    if (session) {
-      const authUrl = new URL("/auth/exchange", fullUrl);
-      authUrl.searchParams.set("access_token", session.access_token);
-      authUrl.searchParams.set("refresh_token", session.refresh_token);
-      window.open(authUrl.toString(), "_blank", "noopener,noreferrer");
-    } else {
+      if (response.ok) {
+        const { redirect_url } = (await response.json()) as {
+          redirect_url: string;
+        };
+        window.open(redirect_url, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      // Fallback: open the satellite directly; it will redirect to its
+      // own login flow if necessary.
       window.open(fullUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +67,11 @@ export function AppCard({
           <div className="min-w-0 flex-1">
             <CardTitle className="text-base flex items-center gap-1.5">
               {name}
-              {fullUrl && <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />}
+              {loading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+              ) : (
+                fullUrl && <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+              )}
             </CardTitle>
             <CardDescription className="text-xs">{description}</CardDescription>
             {!fullUrl && (
