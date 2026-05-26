@@ -93,7 +93,9 @@
     "verify": "Vérifier",
     "banner": "Sécurisez votre compte avec l'authentification à deux facteurs",
     "bannerDesc": "Protégez votre compte en activant la 2FA. Cela ne prend qu'une minute et ajoute une couche de sécurité supplémentaire.",
-    "setup": "Activer la 2FA"
+    "setup": "Activer la 2FA",
+    "requiredTitle": "Authentification à deux facteurs requise",
+    "requiredDesc": "La double authentification (2FA) est obligatoire pour votre rôle. Veuillez configurer votre application d'authentification ci-dessous pour continuer à accéder au portail."
   },
   "nav": {
     "main": "Principal",
