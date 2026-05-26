@@ -5,7 +5,12 @@ const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password
 
 // API routes that must remain public. Use exact match so that future
 // sibling routes under /api/invitations/* stay protected.
-const PUBLIC_API_PATHS = ["/api/invitations/validate"];
+// /api/auth/sso/exchange is the satellite back-channel: it is called
+// from a server (no cookies), so middleware must let it through.
+const PUBLIC_API_PATHS = [
+  "/api/invitations/validate",
+  "/api/auth/sso/exchange",
+];
 
 const MFA_REQUIRED_ROLES = ["admin", "manager"] as const;
 
