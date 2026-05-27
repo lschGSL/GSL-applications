@@ -5,30 +5,17 @@ import { consumeSsoCode } from "@/lib/sso/exchange";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
 
-  // New flow: opaque one-time code, tokens fetched server-side.
-  // Legacy flow (still accepted for backwards compatibility): tokens
-  // passed verbatim in the URL.
   const code = searchParams.get("code");
-  let accessToken: string | null;
-  let refreshToken: string | null;
-
-  if (code) {
-    const result = await consumeSsoCode(code);
-    if (!result.ok) {
-      return NextResponse.redirect(
-        `${origin}/login?message=Invalid or expired SSO code`
-      );
-    }
-    accessToken = result.access_token;
-    refreshToken = result.refresh_token;
-  } else {
-    accessToken = searchParams.get("access_token");
-    refreshToken = searchParams.get("refresh_token");
+  if (!code) {
+    return NextResponse.redirect(
+      `${origin}/login?message=Missing SSO code`
+    );
   }
 
-  if (!accessToken || !refreshToken) {
+  const result = await consumeSsoCode(code);
+  if (!result.ok) {
     return NextResponse.redirect(
-      `${origin}/login?message=Missing authentication tokens`
+      `${origin}/login?message=Invalid or expired SSO code`
     );
   }
 
@@ -59,8 +46,8 @@ export async function GET(request: NextRequest) {
   );
 
   const { error } = await supabase.auth.setSession({
-    access_token: accessToken,
-    refresh_token: refreshToken,
+    access_token: result.access_token,
+    refresh_token: result.refresh_token,
   });
 
   if (error) {

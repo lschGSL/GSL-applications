@@ -340,22 +340,44 @@ Post-login si MFA active:
 
 ### 6.4 SSO / Integration apps externes
 
+Flow en deux temps avec **code opaque one-time** : aucun token ne transite
+jamais par une URL. Le portail mint un code lié aux tokens côté serveur ;
+le satellite l'échange contre les tokens via un appel back-channel
+server-to-server.
+
 ```
 Portal (apps.gsl.lu)                 App externe (news.gsl.lu)
 ─────────────────────                ──────────────────────────
 User clique "Open App"
-  -> Fetch session tokens
-  -> Redirect vers:
-    news.gsl.lu/auth/exchange
-      ?access_token=xxx
-      &refresh_token=yyy
+  -> POST /api/auth/sso/initiate
+       { app_slug }
+  -> Mint code (32 bytes, TTL 60s)
+  -> Stash tokens en DB (RLS service-role)
+  -> Renvoie redirect_url:
+       news.gsl.lu/auth/exchange?code=XYZ
                                      /auth/exchange route:
+                                       -> POST apps.gsl.lu/api/auth/sso/exchange
+                                            { code: "XYZ" }
+                                                                    <- { access_token,
+                                                                         refresh_token,
+                                                                         target_url }
                                        -> supabase.auth.setSession()
                                        -> Cookies set
                                        -> redirect /dashboard
 ```
 
-**Route `/auth/exchange`** (a implementer dans chaque app) :
+Propriétés de sécurité :
+
+- Code aléatoire 32 bytes, single-use (`UPDATE ... WHERE used_at IS NULL`).
+- Expiration 60 secondes après émission.
+- Table `sso_exchange_codes` service-role-only (RLS deny-all).
+- Endpoint `/api/auth/sso/exchange` rate-limité (10 req/min/IP) et renvoie
+  une erreur générique unique pour invalid / used / expired
+  (anti-fingerprinting).
+- Les tokens n'apparaissent ni dans les Referer, ni dans les logs serveur,
+  ni dans l'historique navigateur.
+
+**Route `/auth/exchange`** (à implémenter dans chaque satellite) :
 
 ```typescript
 // app/auth/exchange/route.ts
@@ -364,19 +386,32 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
-  const access_token = url.searchParams.get("access_token");
-  const refresh_token = url.searchParams.get("refresh_token");
+  const code = url.searchParams.get("code");
 
-  if (!access_token || !refresh_token) {
+  if (!code) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  const exchangeUrl = `${process.env.NEXT_PUBLIC_PORTAL_URL}/api/auth/sso/exchange`;
+  const response = await fetch(exchangeUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const { access_token, refresh_token } = (await response.json()) as {
+    access_token: string;
+    refresh_token: string;
+  };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.setSession({
     access_token,
     refresh_token,
   });
-
   if (error) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

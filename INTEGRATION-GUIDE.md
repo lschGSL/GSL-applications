@@ -438,29 +438,49 @@ export function createClient() {
 }
 ```
 
-### 5.3 Route d'échange de tokens — `/src/app/auth/exchange/route.ts`
+### 5.3 Route d'échange de code — `/src/app/auth/exchange/route.ts`
 
-> **CRITIQUE** : Cette route doit exister dans votre application. C'est elle qui reçoit les tokens du portail et établit la session locale.
+> **CRITIQUE** : Cette route doit exister dans votre application. Elle reçoit un **code opaque one-time** depuis le portail (`?code=XYZ`), l'échange contre les tokens Supabase via un appel back-channel server-to-server vers le portail, puis établit la session locale.
+>
+> **Important** : les tokens ne transitent **jamais** par l'URL. Le portail ne renvoie que le code ; toute logique lisant `?access_token=` / `?refresh_token=` depuis la query string est obsolète et recevra `null`.
 
 ```typescript
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const accessToken = searchParams.get("access_token");
-  const refreshToken = searchParams.get("refresh_token");
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
 
-  if (!accessToken || !refreshToken) {
+  if (!code) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?message=Missing authentication tokens`
+      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?message=Missing SSO code`
     );
   }
 
+  // Back-channel exchange (server-to-server, no portal session cookies needed).
+  const exchangeUrl = `${process.env.NEXT_PUBLIC_PORTAL_URL}/api/auth/sso/exchange`;
+  const exchangeResponse = await fetch(exchangeUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+
+  if (!exchangeResponse.ok) {
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_PORTAL_URL}/login?message=Invalid or expired SSO code`
+    );
+  }
+
+  const { access_token, refresh_token } = (await exchangeResponse.json()) as {
+    access_token: string;
+    refresh_token: string;
+  };
+
   const supabase = await createClient();
   const { error } = await supabase.auth.setSession({
-    access_token: accessToken,
-    refresh_token: refreshToken,
+    access_token,
+    refresh_token,
   });
 
   if (error) {
@@ -469,10 +489,19 @@ export async function GET(request: Request) {
     );
   }
 
-  // Redirige vers la page principale de l'application
-  return NextResponse.redirect(`${origin}/`);
+  return NextResponse.redirect(new URL("/", request.url));
 }
 ```
+
+**Endpoint portail `/api/auth/sso/exchange`** (référence, déjà implémenté côté portail) :
+
+- `POST` avec body JSON `{ "code": "<hex 64 chars>" }`
+- Succès `200` : `{ access_token, refresh_token, target_url }`
+- Échec `400` : code inconnu / déjà utilisé / expiré (erreur volontairement
+  vague pour empêcher le fingerprinting de codes valides)
+- Échec `429` : rate limit dépassé (10 req/min/IP), avec header `Retry-After`
+- Le code est consommé atomiquement : un second appel avec le même code
+  échoue toujours, même en cas de race.
 
 ### 5.4 Middleware d'authentification — `/src/middleware.ts`
 
